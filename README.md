@@ -8,17 +8,19 @@
 ![php version](https://img.shields.io/packagist/php-v/calvinalkan/better-wordpress-hooks)
 ![lines of code](https://img.shields.io/badge/total%20lines-2268-blue)
 
-BetterWpHooks is a small library that wraps the Wordpress Plugin/Hook API allowing for modern, OOP PHP with features like:
+BetterWpHooks is a small library that wraps the Wordpress Plugin/Hook API, allowing for modern, object-oriented PHP. 
 
-🚀 Lazy instantiation of classes registered in actions and filters
+Some of the included features are:
 
-🔥 Zero configuration dependency-resolution of class and method dependencies using an IoC-Container
+🚀 Lazy instantiation of classes registered in actions and filters.
+
+🔥 Zero configuration dependency-resolution of class and method dependencies using an IoC-Container.
 
 ❤ Conditional dispatching and handling of hooks based on parameters only available at runtime.
 
-📦 Inbuilt testing module, so you don't have to boostrap the wordpress core in your unit tests.
+📦 Inbuilt testing module, no more third-party mocking libraries or bootstrapping core to test hooks.
 
-⭐ 100 % compatibility with the Wordpress Core and the way users interact with custom hooks and filters.
+⭐ 100 % compatibility with Wordpress Core and the way users can interact with custom hooks and filters.
 
 ## Table of Contents
 
@@ -60,16 +62,15 @@ PHP, [The Wordpress Plugin-API](https://codex.wordpress.org/Plugin_API/Hooks) ha
 **The main issues of the Wordpress Plugin/Hook API are:**
 
 - No usage
-  of [Dependency Injection or an IoC-Container](https://www.martinfowler.com/articles/injection.html#ServiceLocatorVsDependencyInjection)
-  . If you care about code quality and maintainability of your code you use an IoC-Container.
-- There is **no proper place to define actions and filters**. Many Wordpress devs default to using a class constructor
-  which is not a great option for several reasons. Another approach I see a lot of the times is a custom factory which
-  often leads to your IDE not being able to detect where you added hooks.
+  of [dependency injection or an IoC-Container](https://www.martinfowler.com/articles/injection.html#ServiceLocatorVsDependencyInjection)
+  . If you care about quality and maintainability of your code you use an IoC-Container.
+- There is **no proper place to define actions and filters**. Many Wordpress-devs default to using the class constructor
+  which is not a great option for several reasons. Another common approach is  using a custom factory which
+  often leads to your IDE not being able to detect where you added hooks. Not ideal.
 - When using class-based callbacks, the only option besides using static methods ( *don't do that ) is to **instantiate
-  the class on every request** before creating the Wordpress Hook. I can't think of any modern PHP-framework that forces
-  you to instantiate classes to **MAYBE** be used later as an event observer. Let's review an example that can be found
-  in 95% of Wordpress plugin code. Classes that do stuff and also control when they do it. ( Violation of
-  the [SRP](https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html)  . )
+  the class on every request** before creating the Wordpress Hook. There isn't any modern PHP-framework that forces
+  you to instantiate classes to **MAYBE** be used later as an event observer. Let's review an example that can be found in a similar way
+  in 95% popular Wordpress plugins. 
 
 ```php
 // Approach #1, creating the class and passing the object to the hook.
@@ -87,7 +88,7 @@ class MyClass {
     }
 }
 
-// Approach #2, even worse. Using static functions.
+// Approach #2, Using static functions, worse.
 add_action('init', [ MyClass::class, 'doStuffStatic' ]);
 ```
 
@@ -97,7 +98,7 @@ right and changing the constructor arguments at some point in the future might b
 
 - Wordpress is event-driven. Hooks have to be added on every request. Yet there is **no clearly defined way to
   conditionally fire hooks** based on variables you only have available at runtime. Some code may only ever be required
-  under certain circumstances, yet the classes get created on every request. An Example might be a class that handles
+  under very specific circumstances, yet the class-callbacks get instantiated on every request. An Example might be a class that handles
   sending a gift card if a customer did a purchase with an order value greater than 500$.
 
 ```php
@@ -131,11 +132,11 @@ class GiftCardHandler {
 ```
 
 We only ever use this class under very special circumstances, yet we have to create it on every request to pass it to
-the Wordpress Hook.
+the Wordpress hook.
 
-- Lastly, unit testing ( I hope you unit test your plugin code ) this code is complicated since it's tightly coupled to
+- Lastly, unit testing ( **yes, wordpress plugins should be unit-tested** ) this code is complicated since it's tightly coupled to
   Wordpress Core functions which means you either have to bootstrap the entire Wordpress installation during your test
-  set up or use a Wordpress mocking framework like [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
+  set-up or use a Wordpress mocking framework like [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
   or [WP_Mock](https://github.com/10up/wp_mock). I have used them both, they are great. But it should not be necessary
   to go through such hoops to test a basic event pattern.
 
@@ -1313,13 +1314,12 @@ The actual building of the ```$listener``` happens inside the ``execute()`` meth
 
 ## Compatibility
 
-TO-DO: Explain why its 100% compatible with Wordpress.
+TO-DO: Explain why everything is 100% compatible with Wordpress.
 
 ## TO-DO
 
-- Set up CI
 - Move the documentation to a dedicated site.
-- Hire proffreader to correct my english mistakes ( I'm German ).
+- Hire proofreader to correct english mistakes ( I'm German ).
 
 ## Credits
 
