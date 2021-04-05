@@ -1260,7 +1260,7 @@ Its recommended that you create a custom factory class and **dont bootstrap your
 
 ## How it works
 
-To understand how BetterWpHooks its necessary to explain how the Core Plugin/Hook API works.
+To understand how BetterWpHooks works, it's necessary to explain how the Core Plugin/Hook API works.
 
 At a basic level, everything you add via ``add_action()`` and ``add_filter()`` is stored in a global
 variable ``$wp_filter``. ( ...yikes )
@@ -1269,8 +1269,8 @@ Many WP-devs don't know this, but ``add_action()`` and ``add_filter()`` are exac
 function [only delegates](https://github.com/WordPress/WordPress/blob/master/wp-includes/plugin.php#L409)
 to ``add_filter()``.
 
-When either the ``do_action('tag')`` or ``apply_filters('tag')`` is called, Wordpress iterates over every registered
-array item inside the global `$wp_filter['tag']` associative array and calls the registered callback functions.
+When either ``do_action('tag')`` or ``apply_filters('tag')`` is called, Wordpress iterates over every registered
+array key inside the global `$wp_filter['tag']` associative array and calls the registered callback functions.
 
 A callback can either be:
 
@@ -1278,7 +1278,7 @@ A callback can either be:
 - a `[ CallbackClass::class, 'method' ]` combination, where ``method`` needs to be static in order to not cause
   deprecation errors.
 - a `[ new CallbackClass(), 'method' ]` combination, where the handling class is already instantiated. This is the most
-  common way in combination with adding hooks in the constructor like this:
+  commonly used way in combination with adding hooks in the constructor:
 
 ```php
  class CallbackCLass {
@@ -1425,12 +1425,37 @@ the ``AbstractListener`` class and differs a bit for every listener type.
 
 ## Compatibility
 
-TO-DO: Explain why everything is 100% compatible with Wordpress.
+BetterWpHooks is 100% compatible with how the Wordpress Plugin/Hook API works. 
+
+- No Core files get modified.
+- No custom Event/Observer pattern is introduced. Actions and Filters are executed exactly the same way as they normally would.
+- **Can be used by any amount of plugins on the same site.** Since every plugin creates its own Facade via the `BetterWpHooksFacade` Trait, there will never be a case where two plugins try to do conflicting stuff with the Dispatcher or the IoC-Container. 
+- **Third-Party developers can create custom hooks for your events the same way they normally would** using `add_action`, `add_filter` . Arguably its even easier since callbacks will receive just one parameter, so that they don't have to search the docs for the amount of paramenters they need to use. 
+- Additional features: It's very easy to allow for removable/customization for advanced usage. Normally with Wordpress, it would be very hard, to remove a hook callback that uses an instantiated object as the hook callback, because Wordpress uses `spl_object_hash()` to store the hook_id. The same goes for closures. 
+If you like, you could provide your own custom functions to interact with your `BetterWpHooksFacade` instance. For example:
+ 
+```php 
+if ( ! function_exists('acme_remove_filter') {
+    function acme_remove_filter($tag, $callback) {
+    
+        AcmeEvents::forgetOne($tag, $callback);
+
+    }
+}
+
+// Third-party dev that wants to customise AcmeEvents
+acme_remove_filter(Event1::class, Listener1::class);
+
+// This works. 
+add_filter(Event1::class, ThridPartyListener::class)
+```
+
+
 
 ## TO-DO
 
 - Move the documentation to a dedicated site.
-- Hire proofreader to correct english mistakes ( I'm German ).
+- Hire a proofreader to correct english mistakes ( I'm German ).
 
 ## Credits
 
