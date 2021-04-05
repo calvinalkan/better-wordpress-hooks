@@ -8,7 +8,7 @@
 ![php version](https://img.shields.io/packagist/php-v/calvinalkan/better-wordpress-hooks)
 ![lines of code](https://img.shields.io/badge/total%20lines-2268-blue)
 
-BetterWpHooks is a small library that wraps the Wordpress Plugin/Hook API, allowing for modern, object-oriented PHP. 
+BetterWpHooks is a small library that wraps the Wordpress Plugin/Hook API, allowing for modern, object-oriented PHP.
 
 Some of the included features are:
 
@@ -46,7 +46,7 @@ Some of the included features are:
     * [Stopping a Listener Chain ](#stopping-a-listener-chain)
 * [API](#api)
 * [Inbuilt Testing Module](#inbuilt-testing-module)
-* [How it works](#how-it-works)  
+* [How it works](#how-it-works)
     * [How Events are dispatcher](#how-events-are-dispatched)
     * [How Listeners are called](#how-listeners-are-called)
 * [TO-DO](#to-do)
@@ -65,12 +65,12 @@ PHP, [The Wordpress Plugin-API](https://codex.wordpress.org/Plugin_API/Hooks) ha
   of [dependency injection or an IoC-Container](https://www.martinfowler.com/articles/injection.html#ServiceLocatorVsDependencyInjection)
   . If you care about quality and maintainability of your code you use an IoC-Container.
 - There is **no proper place to define actions and filters**. Many Wordpress-devs default to using the class constructor
-  which is not a great option for several reasons. Another common approach is  using a custom factory which
-  often leads to your IDE not being able to detect where you added hooks. Not ideal.
+  which is not a great option for several reasons. Another common approach is using a custom factory which often leads
+  to your IDE not being able to detect where you added hooks. Not ideal.
 - When using class-based callbacks, the only option besides using static methods ( *don't do that ) is to **instantiate
-  the class on every request** before creating the Wordpress Hook. There isn't any modern PHP-framework that forces
-  you to instantiate classes to **MAYBE** be used later as an event observer. Let's review an example that can be found in a similar way
-  in 95% popular Wordpress plugins. 
+  the class on every request** before creating the Wordpress Hook. There isn't any modern PHP-framework that forces you
+  to instantiate classes to **MAYBE** be used later as an event observer. Let's review an example that can be found in a
+  similar way in 95% popular Wordpress plugins.
 
 ```php
 // Approach #1, creating the class and passing the object to the hook.
@@ -98,8 +98,8 @@ right and changing the constructor arguments at some point in the future might b
 
 - Wordpress is event-driven. Hooks have to be added on every request. Yet there is **no clearly defined way to
   conditionally fire hooks** based on variables you only have available at runtime. Some code may only ever be required
-  under very specific circumstances, yet the class-callbacks get instantiated on every request. An Example might be a class that handles
-  sending a gift card if a customer did a purchase with an order value greater than 500$.
+  under very specific circumstances, yet the class-callbacks get instantiated on every request. An Example might be a
+  class that handles sending a gift card if a customer did a purchase with an order value greater than 500$.
 
 ```php
 // Lets assume we want to send an a email and log to an external service
@@ -134,9 +134,9 @@ class GiftCardHandler {
 We only ever use this class under very special circumstances, yet we have to create it on every request to pass it to
 the Wordpress hook.
 
-- Lastly, unit testing ( **yes, wordpress plugins should be unit-tested** ) this code is complicated since it's tightly coupled to
-  Wordpress Core functions which means you either have to bootstrap the entire Wordpress installation during your test
-  set-up or use a Wordpress mocking framework like [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
+- Lastly, unit testing ( **yes, wordpress plugins should be unit-tested** ) this code is complicated since it's tightly
+  coupled to Wordpress Core functions which means you either have to bootstrap the entire Wordpress installation during
+  your test set-up or use a Wordpress mocking framework like [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
   or [WP_Mock](https://github.com/10up/wp_mock). I have used them both, they are great. But it should not be necessary
   to go through such hoops to test a basic event pattern.
 
@@ -902,8 +902,9 @@ This is where we can use **conditional event listeners**
 
 We define the ```NotifyBusinessOwner``` listener like this with the trait ``ListensConditionally``
 
-When a listener has this trait, **before** calling the defined method ( here its ``handleEvent()`` ) the return value of ``shouldHandle``is evaluated.
-If false is returned the method will not be executed and the ```$event``` object will get passed unchanged to the next listeners ( if there are any ).
+When a listener has this trait, **before** calling the defined method ( here its ``handleEvent()`` ) the return value
+of ``shouldHandle``is evaluated. If false is returned the method will not be executed and the ```$event``` object will
+get passed unchanged to the next listeners ( if there are any ).
 
 ````php
 class NotifyBusinessOwner {
@@ -939,12 +940,13 @@ class NotifyBusinessOwner {
 
 ### Stopping a listener chain
 
-If for some reason you want to stop every following listener from executing after a specific listener you can 
-have the listener use the ```StopsPropagation``` Trait. 
+If for some reason you want to stop every following listener from executing after a specific listener you can have the
+listener use the ```StopsPropagation``` Trait.
 
 **Caveats:**
-This will remove every listener registered by **your instance of `BetterWpHooks`** for the current request.
-The order in which listeners were registered does not matter. The first listener that is registered with the ``StopsPropagation`` Trait will be called, while every other listener will be removed for the current request.
+This will remove every listener registered by **your instance of `BetterWpHooks`** for the current request. The order in
+which listeners were registered does not matter. The first listener that is registered with the ``StopsPropagation``
+Trait will be called, while every other listener will be removed for the current request.
 
 ````php
 $listeners = [
@@ -959,7 +961,9 @@ $listeners = [
 
 ];
 ````
-If ``Listener4`` were to use the ```StopsPropagation``` Trait, every other Listener would be removed for ``Event1`` during the current request.
+
+If ``Listener4`` were to use the ```StopsPropagation``` Trait, every other Listener would be removed for ``Event1``
+during the current request.
 
 ## API
 
@@ -1091,18 +1095,26 @@ AcmeEvents::forgetOne( Event1::class, 'closure_key' );
 
 
 `````
+
 ## Inbuilt Testing Module
 
 In order to unit test code in the context of Wordpress, one should not have to bootstrap the entire Wordpress Core.
 There are two great Wordpress mocking libraries out there:
+
 - [Brain Monkey](https://github.com/Brain-WP/BrainMonkey) and
 - [WP_Mock](https://github.com/10up/wp_mock).
 
-Both are great and work. I have used them both before. But it never felt right to have to use a dedicated mocking framework just to be able not have code blow up because all Wordpress core function are undefined if you don't bootstrap core. ( and have ever unit test last 1 sec+ ).
+Both are great and work. I have used them both before. But it never felt right to have to use a dedicated mocking
+framework just so that all the code does not blow up, because Wordpress Core functions are undefined.
 
-Inspired by the way Laravel handles [event testing](https://laravel.com/docs/8.x/mocking#event-fake), BetterWpHooks was built with testing in mind before the first line of code was written.
+Inspired by the way Laravel handles [event testing](https://laravel.com/docs/8.x/mocking#event-fake), BetterWpHooks was
+built with testing in mind before the first line of code was written.
 
-This is how it works with BetterWpHooks: (example taken from the laravel docs)
+There are two ways you can use the testing-module with BetterWpHooks:
+
+**1. Completely swapping out the underlying dispatcher with a fake-dispatcher:** Using this option none of your
+registered listeners will be executed.
+
 ````php
 class OrderTest extends \PHPUnit\Framework\TestCase
 {
@@ -1111,10 +1123,12 @@ class OrderTest extends \PHPUnit\Framework\TestCase
      */
     public function test_orders_can_be_shipped()
     {
-        // This replaces the dispatcher instance with a FakeDispatcher
+        // This replaces the underlying dispatcher instance with a FakeDispatcher
         AcmeEvents::fake();
 
+
         // Perform order shipping...
+
 
         // Assert that an event was dispatched...
         AcmeEvents::assertDispatched(OrderShipped::class);
@@ -1127,58 +1141,145 @@ class OrderTest extends \PHPUnit\Framework\TestCase
 
         // Assert that no events were dispatched...
         AcmeEvents::assertNothingDispatched();
+        
     }
 }
 ````
 
-### Additional Validation
-
-You can pass a closure to the `assertDispatched` or `assertNotDispatched` methods
-in order to verify that an event was dispatched that passes the given "truth test".
+You can also pass a closure to the `assertDispatched` or assertNotDispatched` methods in order to assert that an event
+was dispatched that passes a given "truth test".
 
 ````php
-AcmeEvents::assertDispatched( function (OrderShipped $event) use ( $order ) {
+// create $order
+
+AcmeEvents::assertDispatched(function (OrderShipped $event) use ($order) {
     return $event->order->id === $order->id;
 });
 ````
 
-### Only faking some events
+**2. Only faking a subset of events:** If you are doing Integration Testing, but you still want to fake some events, (
+maybe because they are talking to a slow or unstable external API ) you might do the following:
 
-If you only want to fake some events and have the rest of them be handled by the real ```WordpressDispatcher```
-you can do this by passing in an array of events into the ``AcmeEvents::fake()`` method.
+1. Create a test which extends `BetterWpHooksTestCase`
+2. In the `setUp` method of your test, call `$this->setUpWp`
+3. In the `tearDown` method of you test, `$this->tearDownWp`
+
+`BetterWpHooksTestCase` extends `\PHPUnit\Framework\TestCase` and takes care of loading all **only**
+the Wordpress Hook API. Loading single pieces of WordPress is a dangerous and brittle endeavour, which is why we created
+a
+stand-alone [repo that exactly mirrors the Wordpress Hook API](https://github.com/calvinalkan/wordpress-hook-api-clone).
+This repo is manually synced for every Wordpress release.
+
+`BetterWpHooksTestCase` also takes care of clearing the global state before and after every test.
+
+You get the full features of the Wordpress Hook API but your tests will still run blazing fast.
+
+Let's assume we want to test the following method.
 
 ````php
-AcmeEvents::fake([
-        OrderCreated::class,
-    ]);
+// SUT
+class OrderProcess {
 
-// OrderCreated will be faked, while other events will be run as usual.
+    public function processNewOrder ($form_data) {
+    
+            // Do stuff with $form_data
+            
+            OrderCreated::dispatch([$order]);
+            StockStatusUpdated::dispatch([$order]);
+    
+    }
+
+}
+
+// Registered Listeners 
+$listeners = [
+    
+                OrderCreated::class => [
+                
+                    
+                    // Listeners you want for integration tests
+                
+            ], 
+
+                StockStatusUpdated::class => [
+            
+                    UpdateSlowThirdPartyApi::class,
+            ]
+ 
+        ];
+
+
+
+// Test
+class OrderProcessTest extends \BetterWpHooks\Testing\BetterWpHooksTestCase {
+
+    protected function setUp() : void{
+    
+        parent::setUp(); 
+        $this->setUpWp();
+        
+        // You need to set up your events and listeners
+        $this->bootstrapAcmeEvents();
+        
+      
+    }   
+
+    protected function tearDown() : void{
+    
+        parent::tearDown();
+        $this->tearDownWp();
+        
+    }
+
+    public function test_orders_can_be_processed()
+    {
+    
+        $subject = new OrderProcess();
+    
+        AcmeEvents::fake([
+        
+            StockStatusUpdated::class,
+            
+        ]);
+        
+        // All listeners for OrderCreated::class will be called. 
+        // UpdateSlowThirdPartyApi::class will NOT be called. 
+        $subject->processNewOrder([ // $test_data ]);
+       
+        // Assertions work for both events. 
+        AcmeEvents::assertDispatched(OrderCreated::class);
+        AcmeEvents::assertDispatched(StockStatusUpdated::class);
+    
+    }
+
+}
 ````
 
-**Important:** If you only wish to fake some events and have others be executed you will need access to all of the Wordpress core functions.
-
-In order to not have to load the entire Wordpress Core, which will make your unit tests run well over a second, BetterWpHooks shipps with a custom test class `BetterWpHooksTestCase` that extends `\PHPUnit\Framework\TestCase`.
-
-Extending `BetterWpHooksTestCase` will take care of loading **only one file**: `wp-includes/plugin.php`.
-
-This will give you access to all the functionality provided by the Plugin/Hook API, but your tests will still run blazing fast.
-
+The `$this->bootstrapAcmeEvents();` can be anything you want, but if you want your listeners to execute you need to properly [bootstrap your `AcmeEvents`instance](#bootstrapping).
+Its recommended that you create a custom factory class and **dont bootstrap your instance in your main plugin file.** so you maintain greater testing flexibility.
 
 ## How it works
 
 To understand how BetterWpHooks its necessary to explain how the Core Plugin/Hook API works.
 
-At a basic level, everything you add via ``add_action()`` and ``add_filter()`` is stored in a global variable ``$wp_filter``. ( ...yikes )
+At a basic level, everything you add via ``add_action()`` and ``add_filter()`` is stored in a global
+variable ``$wp_filter``. ( ...yikes )
 
-Many WP-devs don't know this, but ``add_action()`` and ``add_filter()`` are exactly the same. The ``add_action`` function [only delegates](https://github.com/WordPress/WordPress/blob/master/wp-includes/plugin.php#L409) to ``add_filter()``.
+Many WP-devs don't know this, but ``add_action()`` and ``add_filter()`` are exactly the same. The ``add_action``
+function [only delegates](https://github.com/WordPress/WordPress/blob/master/wp-includes/plugin.php#L409)
+to ``add_filter()``.
 
-When either the ``do_action('tag')`` or ``apply_filters('tag')`` is called, Wordpress iterates over every registered array item inside the 
-global `$wp_filter['tag']` associative array and calls the registered callback functions.
+When either the ``do_action('tag')`` or ``apply_filters('tag')`` is called, Wordpress iterates over every registered
+array item inside the global `$wp_filter['tag']` associative array and calls the registered callback functions.
 
 A callback can either be:
-- an anonymous function 
-- a `[ CallbackClass::class, 'method' ]` combination, where ``method`` needs to be static in order to not cause deprecation errors.
-- a `[ new CallbackClass(), 'method' ]` combination, where the handling class is already instantiated. This is the most common way in combination with adding hooks in the constructor like this:
+
+- an anonymous function
+- a `[ CallbackClass::class, 'method' ]` combination, where ``method`` needs to be static in order to not cause
+  deprecation errors.
+- a `[ new CallbackClass(), 'method' ]` combination, where the handling class is already instantiated. This is the most
+  common way in combination with adding hooks in the constructor like this:
+
 ```php
  class CallbackCLass {
  
@@ -1190,11 +1291,13 @@ A callback can either be:
  
  }
 ```
-### How events are dispatched 
+
+### How events are dispatched
 
 ***
 
-The ```WordpressDispatcher``` class is responsible for dispatching events. You have access to an instance of this class via your ``AcmeEvents``Facade.
+The ```WordpressDispatcher``` class is responsible for dispatching events. You have access to an instance of this class
+via your ``AcmeEvents``Facade.
 
 This is a simplyfied version of the responsible `dispatch` method.
 
@@ -1237,7 +1340,9 @@ public function dispatch( $event, ...$payload ) {
 }
 ````
 
-As the code example demonstrates the Wordpress Plugin API is used, but through the layer of abstraction BetterWpHooks is able to introduce most of its before we actually hit the Plugin API. We also might never hit it [if conditions are not met](#conditional-event-dispatching) 
+As the code example demonstrates the Wordpress Plugin API is used, but through the layer of abstraction BetterWpHooks is
+able to introduce most of its before we actually hit the Plugin API. We also might never hit
+it [if conditions are not met](#conditional-event-dispatching)
 
 If all conditions were to pass, the following method call:
 
@@ -1246,6 +1351,7 @@ BookingCreated::dispatch([$booking_data]);
 ````
 
 would be similar to:
+
 ````php
 // Traditional Wordpress implementation.
 $booking = new Booking($booking_data);
@@ -1259,7 +1365,8 @@ Now, Wordpress would call all the registered Hook Callbacks which brings us to:
 
 ***
 
-BetterWpHooks serves as a layer between your plugin code and the Plugin API. It still uses the Plugin API but in a different way.
+BetterWpHooks serves as a layer between your plugin code and the Plugin API. It still uses the Plugin API but in a
+different way.
 
 There are 3 types of Listeners BetterWpHooks creates under the hood depending of what you registered:
 
@@ -1267,9 +1374,11 @@ There are 3 types of Listeners BetterWpHooks creates under the hood depending of
 - Instance Listeners
 - Class Listeners
 
-The difference between Instance Listeners and Class Listeners is, that an Instance Listener already contains an instantiated class ( because you passed it in ).
+The difference between Instance Listeners and Class Listeners is, that an Instance Listener already contains an
+instantiated class ( because you passed it in ).
 
-No matter which type of Listener is created, **they are all wrapped inside an anonymous closure** which is then passed to the Wordpress Plugin API.
+No matter which type of Listener is created, **they are all wrapped inside an anonymous closure** which is then passed
+to the Wordpress Plugin API.
 
 This happens inside the ``ListenerFactory`` class.
 
@@ -1307,10 +1416,12 @@ private function wrap( AbstractListener $listener ): Closure {
 }
 ````
 
-Wordpress **does not directly call the class callable**. It only knows about the anonymous closure which when executed will execute the listener [if conditions are met](#conditional-event-listening).
+Wordpress **does not directly call the class callable**. It only knows about the anonymous closure which when executed
+will execute the listener [if conditions are met](#conditional-event-listening).
 
 Like this we can achieve lazy instantiation of objects and put an IoC-Container in between Wordpress and the Listener.
-The actual building of the ```$listener``` happens inside the ``execute()`` method which is defined in the ``AbstractListener`` class and differs a bit for every listener type.
+The actual building of the ```$listener``` happens inside the ``execute()`` method which is defined in
+the ``AbstractListener`` class and differs a bit for every listener type.
 
 ## Compatibility
 
