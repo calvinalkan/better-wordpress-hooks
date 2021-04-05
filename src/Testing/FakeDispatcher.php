@@ -68,8 +68,7 @@
 			
 		}
 		
-		
-		
+
 		/**
 		 * Assert if an event was dispatched based on a truth-test callback.
 		 *
