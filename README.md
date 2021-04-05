@@ -1313,13 +1313,12 @@ The actual building of the ```$listener``` happens inside the ``execute()`` meth
 
 ## Compatibility
 
-TO-DO: Explain why its 100% compatible with Wordpress.
+TO-DO: Explain why everything is 100% compatible with Wordpress.
 
 ## TO-DO
 
-- Set up CI
 - Move the documentation to a dedicated site.
-- Hire proffreader to correct my english mistakes ( I'm German ).
+- Hire proofreader to correct english mistakes ( I'm German ).
 
 ## Credits
 
