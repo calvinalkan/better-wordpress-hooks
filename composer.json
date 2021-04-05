@@ -1,0 +1,50 @@
+{
+  "name": "calvinalkan/better-wordpress-hooks",
+  "description": "A modern, laravel-like Api around the Wordpress Hook Class",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "hooks",
+    "laravel",
+    "events"
+  ],
+  "homepage": "https://github.com/calvinalkan/better-wordpress-hooks",
+  "minimum-stability": "stable",
+  "require": {
+    "php": "^7.3",
+    "illuminate/support": "8.35.1",
+    "calvinalkan/base-container": "dev-master"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0",
+    "mockery/mockery": "^1.4.2",
+    "codeception/assert-throws": "dev-master",
+    "calvinalkan/wordpress-hook-api-clone": "dev-master",
+    "php-coveralls/php-coveralls": "^2.4"
+  },
+    "license": "GPL-2.0-or-later",
+    "authors": [
+      {
+        "name": "Calvin Alkan",
+        "email": "calvin@snicco.de"
+      }
+    ],
+    "autoload": {
+      "psr-4": {
+        "BetterWpHooks\\": "src/"
+      },
+      "files": [
+        "src/functions.php"
+      ]
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Tests\\": "tests/"
+      }
+    },
+    "suggest": {
+
+      "phpunit/phpunit": "Requiered if you want to use the FakeDispatcher for testing Event Dispatching."
+
+    }
+  }

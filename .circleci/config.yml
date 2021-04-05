@@ -1,0 +1,32 @@
+# PHP CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-php/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # Specify the version you desire here
+      - image: circleci/php:7.3-node-browsers
+
+    steps:
+      # Checkout from GitHub
+      - checkout
+      # PHP CircleCI 2.0 Configuration File# PHP CircleCI 2.0 Configuration File sudo apt install zlib1g-dev libsqlite3-dev
+      - run: sudo apt update
+      # Installing dependencies
+      - run: sudo docker-php-ext-install zip
+      # Clear composer cache
+      - run: composer clearcache
+      # Self-update composer
+      - run: composer self-update
+      # Run composer install
+      - run: composer install --no-interaction
+      # TEST
+      - run: phpdbg -qrr vendor/bin/phpunit --testsuite unit --coverage-html build/coverage-report --log-junit build/results/results.xml
+      # save test results
+      - store_test_results:
+          path: build/results
+      # save coverage reports
+      - store_artifacts:
+          path: build/coverage-report
