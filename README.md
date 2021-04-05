@@ -1,7 +1,6 @@
 # BetterWpHooks - A modern, OOP Wrapper around the Wordpress Plugin Api.
 
 ![code coverage](https://img.shields.io/badge/coverage-99%25-brightgreen)
-[![Build Status](https://travis-ci.com/calvinalkan/better-wordpress-hooks.svg?branch=master)](https://travis-ci.com/calvinalkan/better-wordpress-hooks)
 ![last commit](https://img.shields.io/github/last-commit/calvinalkan/better-wordpress-hooks)
 ![open issues](https://img.shields.io/github/issues-raw/calvinalkan/better-wordpress-hooks)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
