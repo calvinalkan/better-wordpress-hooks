@@ -7,21 +7,18 @@
 	class BetterWpHooksTestCase extends TestCase {
 	
 		
-		public function setUpWp($wp_root_path) {
-			
-//			if( substr($wp_root_path, -1) == '/') {
-//				$wp_root_path = substr($wp_root_path, 0, -1);
-//			}
-//
-//			$plugin_php = $wp_root_path . '/wp-includes/plugin.php';
-//
-			if ( ! file_exists( $wp_root_path ) ) {
+		public function setUpWp() {
 
-				throw new \Exception('The file: ' . $wp_root_path . ' could not be found.');
+
+            $plugin_php = dirname( __DIR__, 2 ) . '/vendor/calvinalkan/wordpress-hook-api-clone/plugin.php';
+
+			if ( ! file_exists( $plugin_php ) ) {
+
+				throw new \Exception('The file: ../vendor/calvinalkan/wordpress-hook-api-clone/plugin.php ');
 
 			}
 			
-			require_once $wp_root_path;
+			require_once $plugin_php;
 			
 			$GLOBALS['wp_filter']         = [];
 			$GLOBALS['wp_actions']        = [];
