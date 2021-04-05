@@ -1,5 +1,6 @@
 # BetterWpHooks - A modern, OOP Wrapper around the Wordpress Plugin Api.
 
+![CircleCI](https://img.shields.io/circleci/build/github/calvinalkan/better-wordpress-hooks/master?token=888f31e8ca77ad9621a420ab09ce799f3382d52e)
 ![code coverage](https://img.shields.io/badge/coverage-99%25-brightgreen)
 ![last commit](https://img.shields.io/github/last-commit/calvinalkan/better-wordpress-hooks)
 ![open issues](https://img.shields.io/github/issues-raw/calvinalkan/better-wordpress-hooks)
