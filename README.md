@@ -439,7 +439,7 @@ AcmeEvents::make()->mapEvents($mapped)->listeners($listeners)->boot();
    event object.
 3. The called closure will first create the instance and then dispatch an event ```HighOrderValueCreated::class``` which
    passes the created object as an argument to any registered Listener.
-4. Since we registered a listener for the ``HighOrderValueCreated`` our the ``handleEvent``method on the ``ProcessGiftcards``class is now called. ( See [How it works](#) for a detailed explanation ).
+4. Since we registered a listener for the ``HighOrderValueCreated`` event, the ``handleEvent``method on the ``ProcessGiftcards``class is now called. ( See [How it works](#) for a detailed explanation ).
 5. The constructor dependencies ``$mailer, $logger`` are **automatically** injected into the class.
 6. If the ``handleEvent()`` would have any method dependencies besides the event object, those **method dependencies
    would have also been injected automatically.**
