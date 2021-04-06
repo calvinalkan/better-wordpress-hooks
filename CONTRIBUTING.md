@@ -4,7 +4,7 @@ BetterWpHooks is completely open source and everybody is encouraged to participa
 
 - ⭐ the project on GitHub ([https://github.com/calvinalkan/better-wordpress-hooks](https://github.com/calvinalkan/better-wordpress-hooks))
 - Posting bug reports ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
-- (Emailing security issues to [calvin@snicco.de](calvin@snicco.de) instead)
+- (Emailing security issues to [calvin@snicco.de](mailto:calvin@snicco.de) instead)
 - Posting feature suggestions ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
 - Posting and/or answering questions ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
 - Submitting pull requests ([https://github.com/calvinalkan/better-wordpress-hooks/pulls](https://github.com/calvinalkan/better-wordpress-hooks/pulls))
