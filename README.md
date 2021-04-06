@@ -49,6 +49,7 @@ Some included features are:
 * [How it works](#how-it-works)
   * [How Events are dispatcher](#how-events-are-dispatched)
   * [How Listeners are called](#how-listeners-are-called)
+* [Compatbility](#compatibility)    
 * [TO-DO](#to-do)
 * [Contributing](#contributing)
 * [Credits](#credits)
