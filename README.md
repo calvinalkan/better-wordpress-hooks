@@ -385,7 +385,7 @@ class HighValueOrderCreated extends AcmeEvents {
 2. Create a listener that handles the logic when an order with a total >= 500$ is created.
 
 ```php
-class ProcessGitCards {
+class ProcessGiftCards {
 
     private $mailer;
     private $logger;
@@ -401,7 +401,7 @@ class ProcessGitCards {
         $order = $event->order; 
         
         // Example properties. 
-        $this->mailer->sendGitfgard( $order->user_id, $order->items );
+        $this->mailer->sendGiftCard( $order->user_id, $order->items );
         $this->logger->logGiftcardRecepient( $order->user_id, $order->items, $order->purchased_at );
         
    }
@@ -425,7 +425,7 @@ $mapped = [
 $listeners = [
     HighValueOrderCreated::class => [
     
-        ProcessGitCards::class . '@handleEvent'
+        ProcessGiftCards::class . '@handleEvent'
         // More Listeners if needed
 ] ];
 
@@ -533,7 +533,7 @@ the`Illuminate/Container` docs over at [laravel.com](https://laravel.com/docs/8.
 Again: **if the minimum threshold for the total order value is not met, none of this will ever be executed. Everything
 is lazy-loaded at runtime.**
 
-I hope both agree that this implementation is cleaner and most importantly, a lot more extendable and maintainable than
+I hope both agree that this implementation is cleaner and most importantly, a lot more extensible and maintainable than
 anything we can currently implement with the WordPress Plugin/Hook API.
 
 ### Dispatching your Events:
@@ -560,8 +560,8 @@ You can do the following:
 BookingCreated::dispatch( [$book_id, $booking_data] );
 ```
 
-This will first create a new instance of the ```BookingCreated```event passing the arguments into the constructor and
-then run the event through the ``Dispatcher``instance provided by your custom class ``AcmeEvents`` ( Remember all events
+This will first create a new instance of the ```BookingCreated``` event passing the arguments into the constructor and
+then run the event through the ``Dispatcher`` instance provided by your custom class ``AcmeEvents`` ( Remember all events
 would extend the ``AcmeEvents`` class ).
 
 ```php
@@ -644,7 +644,7 @@ BookingCreated::dispatchUnless( $appointment->participantCount() >= 5, [$appoint
 Using the default Plugin/Hook API you need to distinguish between using ``add_action`` and ```add_filter``` .
 BetterWpHooks takes care of this under the hood. The syntax is the same for defining actions and filters. Let's
 review a simple example where we might want to allow other developers to modify appointment data created by our
-fictive appointment plugin.
+fictional appointment plugin.
 
 ````php
 // Code to create an appointment object
@@ -692,9 +692,9 @@ Plugin API will be called under the hood.
 
 Default return values are evaluated in the following order:
 
-1. If you are dispatching an event object you can define a ````default()```` method on the event object class. This method will be called if it exists and the returned value will be passed as a default value.
+1. If you are dispatching an event object you can define a ````default()```` method on the event object class. This method will be called if it exists, and the returned value will be passed as a default value.
 
-2. If there is no ````default()```` method on the event class but you are dispatching an event object, the object itself will be returned. For the example above the instance of ``AppointmentCreated`` would be returned.
+2. If there is no ````default()```` method on the event class, but you are dispatching an event object, the object itself will be returned. For the example above the instance of ``AppointmentCreated`` would be returned.
 
 3. If #1 and #2 are not possible the first parameter passed into the ````dispatch()```` method will be returned.
 
@@ -702,7 +702,7 @@ Default return values are evaluated in the following order:
 
 ### Valid Listeners
 
-A listener, just like with the default WordPress Plugin/Hook API can either be an anonymous closure or a class callable.
+A listener, just like with the default WordPress Plugin/Hook API can either be an anonymous closure, or a class callable.
 Any of the following options are valid for creating a listener with the Dispatcher. By default, if no method is
 specified BetterWpHooks will try to call the ````handleEvent()```` method on your listener.
 
@@ -854,7 +854,7 @@ If ```FALSE``` is returned, the WordPress Plugin/API will never be hit, neither 
 
 In some cases, it might be useful to determine at runtime if a listener should handle an Event.
 
-Let's consider the following fictive Use case:
+Let's consider the following fictional Use case:
 
 **Every time an appointment is booked you want to:**
 
@@ -1097,8 +1097,8 @@ There are two great WordPress mocking libraries out there:
 - [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
 - [WP_Mock](https://github.com/10up/wp_mock).
 
-Both are great and work. I have used them both before. But it never felt right to have to use a dedicated mocking
-a framework just so that all the code does not blow up, because WordPress Core functions are undefined.
+Both are great and work, I have used them both before. However, it never felt right to have to use a dedicated mocking
+framework just so that all the code does not blow up because WordPress Core functions are undefined.
 
 Inspired by the way Laravel handles [event testing](https://laravel.com/docs/8.x/mocking#event-fake), BetterWpHooks was
 built with testing in mind before the first line of code was written.
@@ -1309,7 +1309,7 @@ public function dispatch( $event, ...$payload ) {
 	// In a sense we just swap $event and $payload.	
 	[ $event, $payload ] = $this->parseEventAndPayload( $event, $payload );
 					
-	// Here we handle temporal removal if a listener wants to stop
+	// Here we handle temporary removal if a listener wants to stop
 	// a listener chain.					
 	$this->maybeStopPropagation( $event );
 	
@@ -1324,16 +1324,16 @@ public function dispatch( $event, ...$payload ) {
                         
             return is_object( $payload ) ? $payload : $payload[0];
                         
-        }
+    }
 		
 	// If we make it this far, only here do we hit the WordPress Plugin API.
-        return $this->hook_api->applyFilter( $event, $payload );
+    return $this->hook_api->applyFilter( $event, $payload );
 			
 			
 }
 ````
 
-Like the example demonstrates, the WordPress Plugin API is used, but through the layer of abstraction, BetterWpHooks can introduce most of its before we hit the Plugin API. We also might never hit
+Like the example demonstrates, the WordPress Plugin API is used but through a layer of abstraction, BetterWpHooks can introduce most of its before we hit the Plugin API. We also might never hit
 it [if conditions are not met](#conditional-event-dispatching)
 
 If all conditions were to pass, the following method call:
@@ -1453,7 +1453,7 @@ The composer autoloader will only load the version that is first required. Since
 
 **This is not an issue of composer, nor of this library**, but from WordPress still not having a dedicated solution for dependency management in 2021. 
 
-Until WordPress finds are way to solve this, the only way to be 100% is to wrap every dependecy that your plugin has in your own namespace (...yikes again).
+Until WordPress finds are way to solve this, the only way to be 100% is to wrap every dependency that your plugin has in your own namespace (...yikes again).
 
 However, there are projects that facilitate this process: 
 
