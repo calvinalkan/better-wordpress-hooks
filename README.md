@@ -24,7 +24,7 @@ Some of the included features are:
 
 ## Table of Contents
 
-* [Why bother?](#why-bother--long-)
+* [Why bother?](#why-bother)
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Key Concepts](#key-concepts)
