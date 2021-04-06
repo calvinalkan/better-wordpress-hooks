@@ -28,27 +28,27 @@ Some included features are:
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Key Concepts](#key-concepts)
-    * [Terminology](#terminology)
-    * [Entry point](#entry-point)
-    * [IoC-Container](#1-ioc-container)
-    * [Events](#2-events)
-    * [Event Dispatcher](#3-event-dispatcher)
-    * [Event-Mapper](#4-event-mapper)
+  * [Terminology](#terminology)
+  * [Entry point](#entry-point)
+  * [IoC-Container](#1-ioc-container)
+  * [Events](#2-events)
+  * [Event Dispatcher](#3-event-dispatcher)
+  * [Event-Mapper](#4-event-mapper)
 * [Bootstrapping](#bootstrapping)
 * [Using BetterWpHooks](#using-betterwphooks)
-    * [Complete Example with 3rd-party Hooks](#complete-example-using-third-party-hooks)
-    * [Dispatching your own events](#dispatching-your-events)
-    * [Wordpress Filters](#wordpress-filters)
-    * [Valid Listeners](#valid-listeners)
-    * [Dependency Resolution](#dependency-resolution)
-    * [Conditional Event Dispatching](#conditional-event-dispatching)
-    * [Conditional Listeners](#conditional-event-listening)
-    * [Stopping a Listener Chain ](#stopping-a-listener-chain)
+  * [Complete Example with 3rd-party Hooks](#complete-example-using-third-party-hooks)
+  * [Dispatching your own events](#dispatching-your-events)
+  * [Wordpress Filters](#wordpress-filters)
+  * [Valid Listeners](#valid-listeners)
+  * [Dependency Resolution](#dependency-resolution)
+  * [Conditional Event Dispatching](#conditional-event-dispatching)
+  * [Conditional Listeners](#conditional-event-listening)
+  * [Stopping a Listener Chain ](#stopping-a-listener-chain)
 * [API](#api)
 * [Inbuilt Testing Module](#inbuilt-testing-module)
 * [How it works](#how-it-works)
-    * [How Events are dispatcher](#how-events-are-dispatched)
-    * [How Listeners are called](#how-listeners-are-called)
+  * [How Events are dispatcher](#how-events-are-dispatched)
+  * [How Listeners are called](#how-listeners-are-called)
 * [TO-DO](#to-do)
 * [Contributing](#contributing)
 * [Credits](#credits)
@@ -63,14 +63,14 @@ PHP, [The WordPress Plugin-API](https://codex.wordpress.org/Plugin_API/Hooks) ha
 **The main issues of the WordPress Plugin/Hook API are:**
 
 1. No usage
-  of [dependency injection or an IoC-Container](https://www.martinfowler.com/articles/injection.html#ServiceLocatorVsDependencyInjection)
-  . If you care about the quality and maintainability of your code you use an IoC-Container.
-  
-2. Defining the amount of parameters your callback should expect is annoying and often leads to seemingly random bugs if the order or amount of the received parameters should ever change. WordPress should be able to solve this on its own behind the scenes but due to the insane backwards compatibility commitments the native [PHP Reflection API](https://www.php.net/manual/en/book.reflection.php) can't be used. 
+   of [dependency injection or an IoC-Container](https://www.martinfowler.com/articles/injection.html#ServiceLocatorVsDependencyInjection)
+   . If you care about the quality and maintainability of your code you use an IoC-Container.
+
+2. Defining the number of parameters your callback should expect is annoying and often leads to seemingly random bugs if the order or amount of the received parameters should ever change. WordPress should be able to solve this on its own behind the scenes but due to the insane backwards compatibility commitments the native [PHP Reflection API](https://www.php.net/manual/en/book.reflection.php) can't be used.
 3. There is **no proper place to define actions and filters**. Many WordPress developers default to using the class constructor which is not a great option for several reasons. Another common approach is using a custom factory which often leads to your IDE not being able to detect where you added hooks. Not ideal.
-4. When using class-based callbacks, the only option besides using static methods ( *don't do that ) is to **instantiate the class on every request** before creating the WordPress Hook. There isn't any modern PHP framework that forces you to instantiate classes to **MAYBE** be used later as an event observer. 
-Additionally, using OOP practices when defining hooks always leads to [hooks being unremovable for third-party developers](https://inpsyde.com/en/remove-wordpress-hooks/) because WordPress will use `spl_object_hash` to store the hook id.
-   
+4. When using class-based callbacks, the only option besides using static methods ( *don't do that ) is to **instantiate the class on every request** before creating the WordPress Hook. There isn't any modern PHP framework that forces you to instantiate classes to **MAYBE** be used later as an event observer.
+   Additionally, using OOP practices when defining hooks always leads to [hooks being unremovable for third-party developers](https://inpsyde.com/en/remove-wordpress-hooks/) because WordPress will use `spl_object_hash` to store the hook id.
+
 Let's review an example that can be found similarly in 95% of popular WordPress plugins.
 
 ```php
@@ -533,7 +533,7 @@ Again: **if the minimum threshold for the total order value is not met, none of 
 is lazy-loaded at runtime.**
 
 I hope both agree that this implementation is cleaner and most importantly, a lot more extendable and maintainable than
-anything we can currently implement in with the WordPress Plugin/Hook API.
+anything we can currently implement with the WordPress Plugin/Hook API.
 
 ### Dispatching your Events:
 
@@ -1421,7 +1421,7 @@ BetterWpHooks is 100% compatible with how the WordPress Plugin/Hook API works.
 - No custom Event/Observer pattern is introduced. Actions and Filters are executed the same way as they normally would.
 - **Can be used by any amount of plugins on the same site.** Since every plugin creates its Facade via the `BetterWpHooksFacade` Trait, there will never be a case where two plugins try to do conflicting stuff with the Dispatcher or the IoC-Container.
 - **Third-Party developers can create custom hooks for your events the same way they normally would** using `add_action`, `add_filter` . Arguably it's even easier since callbacks will receive just one parameter so that they don't have to search the docs for the number of parameters they need to use.
-- Additional features: It's very easy to allow the removal/customization of hooks for advanced users. Normally with WordPress, it would be very hard, to remove a hook, that uses an instantiated object as the hook callback, because WordPress uses `spl_object_hash()` function to store the hook_id. The same goes for closures. There are even [dedicated packages trying to solve this exact problem](https://github.com/inpsyde/objects-hooks-remover), removing plugin hooks when objects or closures are used.
+- Additional features: It's very easy to allow the removal/customization of hooks for advanced users. Normally with WordPress, it would be very hard, to remove a hook, that uses an instantiated object as the hook callback, because WordPress uses the `spl_object_hash()` function to store the hook_id. The same goes for closures. There are even [dedicated packages trying to solve this exact problem](https://github.com/inpsyde/objects-hooks-remover), removing plugin hooks when objects or closures are used.
   With BetterWpHooks this becomes quite easy for users that want to customize your plugin.
   If you like, you could provide your own custom functions to interact with your `BetterWpHooksFacade` instance. For example:
 
