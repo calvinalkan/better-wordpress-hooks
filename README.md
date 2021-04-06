@@ -815,7 +815,7 @@ before any other dependencies**.
 
 ### Conditional Event Dispatching
 
-This is meant to be used for actions and filters whose triggering are not under your control. ( i.e. core or third-party
+This is meant to be used **for actions and filters whose triggering are not under your control.** ( i.e. core or third-party
 plugin hooks).
 
 For events that you control it's easier to just use the ````dispatchIf```` and ````dispatchUnless```` helpers. However,
@@ -1036,12 +1036,13 @@ AcmeEvents::hasListenersFor( Listener1::class . '@foobar', Event1::class);
 The following combinations are valid ways to search for a registered listener.
 
 `````php
-[ Listener1::class, '*' ]
-[ Listener1::class . '@*']
-[ Listener1::class . '*' ]
-[ Listener1::class, 'foobar' ]
-[ Listener1::class . '@handleEvent']
-[ Listener1::class, 'handleEvent' ]
+[ Listener1::class, '*' ]               // will search for Listener1::class + any method
+[ Listener1::class . '@*']              // will search for Listener1::class + any method
+[ Listener1::class . '*' ]              // will search for Listener1::class + any method
+[ Listener1::class, 'foobar' ]          // will search for Listener1::class + foobar method
+[ Listener1::class . '@handleEvent']    // will search for Listener1::class + handleEvent method
+[ Listener1::class, 'handleEvent' ]     // will search for Listener1::class + handleEvent method
+[ Listener1::class]                     // will search for Listener1::class + handleEvent method
 `````
 
 #### Deleting a listener for an event.
