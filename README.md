@@ -50,6 +50,7 @@ Some of the included features are:
     * [How Events are dispatcher](#how-events-are-dispatched)
     * [How Listeners are called](#how-listeners-are-called)
 * [TO-DO](#to-do)
+* [Contributing](#contributing)  
 * [Credits](#credits)
 
 ***
@@ -1455,10 +1456,26 @@ add_filter(Event1::class, ThridPartyListener::class)
 ## TO-DO
 
 - Move the documentation to a dedicated site.
-- Hire a proofreader to correct english mistakes ( I'm German ).
+- Improve grammar and spelling of README.md ( I'm German ) - **pull requests are very welcome.** 
+
+## Contributing
+
+BetterWpHooks is completely open source and everybody is encouraged to participate by:
+
+- Reviewing [`CONTRIBUTING.md`]().
+- ⭐ the project on GitHub ([https://github.com/calvinalkan/better-wordpress-hooks](https://github.com/calvinalkan/better-wordpress-hooks))
+- Posting bug reports ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
+- (Emailing security issues to [calvin@snicco.de](calvin@snicco.de) instead)
+- Posting feature suggestions ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
+- Posting and/or answering questions ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
+- Submitting pull requests ([https://github.com/calvinalkan/better-wordpress-hooks/pulls](https://github.com/calvinalkan/better-wordpress-hooks/pulls))
+- Sharing your excitement about BetterWpHooks with your community
+
+
+
 
 ## Credits
 
 - ``Laravel Framework``: While not depending on
-  the [Illuminate/Events](https://packagist.org/packages/illuminate/events) package, BetterWpHooks was heavyly inspired
-  by the way Laravel handles event dispatching.
+  the [Illuminate/Events](https://packagist.org/packages/illuminate/events) package, BetterWpHooks was heavily inspired
+  by the way Laravel handles event dispatching. Especially the testing-features are extremly close to the [laravel testing features](https://github.com/illuminate/support/blob/master/Testing/Fakes/EventFake.php).
