@@ -1462,7 +1462,7 @@ add_filter(Event1::class, ThridPartyListener::class)
 
 BetterWpHooks is completely open source and everybody is encouraged to participate by:
 
-- Reviewing [`CONTRIBUTING.md`]().
+- Reviewing `CONTRIBUTING.md`
 - ⭐ the project on GitHub ([https://github.com/calvinalkan/better-wordpress-hooks](https://github.com/calvinalkan/better-wordpress-hooks))
 - Posting bug reports ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
 - (Emailing security issues to [calvin@snicco.de](calvin@snicco.de) instead)
