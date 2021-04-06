@@ -1,4 +1,4 @@
-# BetterWpHooks - A modern, OOP Wrapper around the Wordpress Plugin Api.
+# BetterWpHooks - A modern, OOP Wrapper around the WordPress Plugin API.
 
 ![CircleCI](https://img.shields.io/circleci/build/github/calvinalkan/better-wordpress-hooks/master?label=circleci&token=888f31e8ca77ad9621a420ab09ce799f3382d52e)
 ![code coverage](https://img.shields.io/badge/coverage-99%25-brightgreen)
@@ -8,9 +8,9 @@
 ![php version](https://img.shields.io/packagist/php-v/calvinalkan/better-wordpress-hooks)
 ![lines of code](https://img.shields.io/badge/total%20lines-2268-blue)
 
-BetterWpHooks is a small library that wraps the Wordpress Plugin/Hook API, allowing for modern, object-oriented PHP.
+BetterWpHooks is a small library that wraps the WordPress Plugin/Hook API, allowing for modern, object-oriented PHP.
 
-Some of the included features are:
+Some included features are:
 
 🚀 Lazy instantiation of classes registered in actions and filters.
 
@@ -20,7 +20,7 @@ Some of the included features are:
 
 📦 Inbuilt testing module, no more third-party mocking libraries or bootstrapping core to test hooks.
 
-⭐ 100 % compatibility with Wordpress Core and the way users can interact with custom hooks and filters.
+⭐ 100 % compatibility with WordPress Core and the way users can interact with custom hooks and filters.
 
 ## Table of Contents
 
@@ -35,10 +35,10 @@ Some of the included features are:
     * [Event Dispatcher](#3-event-dispatcher)
     * [Event-Mapper](#4-event-mapper)
 * [Bootstrapping](#bootstrapping)
-* [Using BetterWpHooks](#using-betterwp-hooks)
+* [Using BetterWpHooks](#using-betterwphooks)
     * [Complete Example with 3rd-party Hooks](#complete-example-using-third-party-hooks)
-    * [Dispatching your own events](#dispatching-your-own-events)
-    * [Wordpress Filters](#dispatching-your-own-events)
+    * [Dispatching your own events](#dispatching-your-events)
+    * [Wordpress Filters](#wordpress-filters)
     * [Valid Listeners](#valid-listeners)
     * [Dependency Resolution](#dependency-resolution)
     * [Conditional Event Dispatching](#conditional-event-dispatching)
@@ -50,28 +50,28 @@ Some of the included features are:
     * [How Events are dispatcher](#how-events-are-dispatched)
     * [How Listeners are called](#how-listeners-are-called)
 * [TO-DO](#to-do)
-* [Contributing](#contributing)  
+* [Contributing](#contributing)
 * [Credits](#credits)
 
 ***
 
 ## Why bother?
 
-Being released in Wordpress 2.1, in a time when OOP wasn't a thing yet in
-PHP, [The Wordpress Plugin-API](https://codex.wordpress.org/Plugin_API/Hooks) has several shortcomings.
+Being released in WordPress 2.1, in a time when OOP wasn't a thing yet in
+PHP, [The WordPress Plugin-API](https://codex.wordpress.org/Plugin_API/Hooks) has several shortcomings.
 
-**The main issues of the Wordpress Plugin/Hook API are:**
+**The main issues of the WordPress Plugin/Hook API are:**
 
-- No usage
+1. No usage
   of [dependency injection or an IoC-Container](https://www.martinfowler.com/articles/injection.html#ServiceLocatorVsDependencyInjection)
-  . If you care about quality and maintainability of your code you use an IoC-Container.
-- There is **no proper place to define actions and filters**. Many Wordpress-devs default to using the class constructor
-  which is not a great option for several reasons. Another common approach is using a custom factory which often leads
-  to your IDE not being able to detect where you added hooks. Not ideal.
-- When using class-based callbacks, the only option besides using static methods ( *don't do that ) is to **instantiate
-  the class on every request** before creating the Wordpress Hook. There isn't any modern PHP-framework that forces you
-  to instantiate classes to **MAYBE** be used later as an event observer. Let's review an example that can be found in a
-  similar way in 95% popular Wordpress plugins.
+  . If you care about the quality and maintainability of your code you use an IoC-Container.
+  
+2. Defining the amount of parameters your callback should expect is annoying and often leads to seemingly random bugs if the order or amount of the received parameters should ever change. WordPress should be able to solve this on its own behind the scenes but due to the insane backwards compatibility commitments the native [PHP Reflection API](https://www.php.net/manual/en/book.reflection.php) can't be used. 
+3. There is **no proper place to define actions and filters**. Many WordPress developers default to using the class constructor which is not a great option for several reasons. Another common approach is using a custom factory which often leads to your IDE not being able to detect where you added hooks. Not ideal.
+4. When using class-based callbacks, the only option besides using static methods ( *don't do that ) is to **instantiate the class on every request** before creating the WordPress Hook. There isn't any modern PHP framework that forces you to instantiate classes to **MAYBE** be used later as an event observer. 
+Additionally, using OOP practices when defining hooks always leads to [hooks being unremovable for third-party developers](https://inpsyde.com/en/remove-wordpress-hooks/) because WordPress will use `spl_object_hash` to store the hook id.
+   
+Let's review an example that can be found similarly in 95% of popular WordPress plugins.
 
 ```php
 // Approach #1, creating the class and passing the object to the hook.
@@ -94,16 +94,13 @@ add_action('init', [ MyClass::class, 'doStuffStatic' ]);
 ```
 
 For a simple class this might work just fine, but now imagine that `MyClass`
-has nested dependencies and handles several Wordpress hooks. Constructing this object on every request just doesn't feel
-right and changing the constructor arguments at some point in the future might be very painful.
+has nested dependencies and handles several WordPress hooks. Constructing this object on every request just doesn't feel
+right and changing the constructor arguments in the future might be very painful.
 
-- Wordpress is event-driven. Hooks have to be added on every request. Yet there is **no clearly defined way to
-  conditionally fire hooks** based on variables you only have available at runtime. Some code may only ever be required
-  under very specific circumstances, yet the class-callbacks get instantiated on every request. An Example might be a
-  class that handles sending a gift card if a customer did a purchase with an order value greater than 500$.
+5. WordPress is event-driven. Hooks have to be added on every request. Yet there is **no clearly defined way to conditionally fire hooks** based on variables you only have available at runtime. Some code may only ever be required under very specific circumstances, yet the class callbacks get instantiated on every request. An example might be a class that handles sending a gift card if a customer placed an order with a total value greater than 500$.
 
 ```php
-// Lets assume we want to send an a email and log to an external service
+//Let's assume we want to send an email and log to an external service
 // ( maybe a google sheet ) every time an order takes place with a total > 500. 
 class GiftCardHandler {
 
@@ -119,7 +116,7 @@ class GiftCardHandler {
         
     }
     
-    // Lets assume we get an order object from the hook.
+    //Let's assume we get an order object from the hook.
     public function handle (Order $order) {
     
         if ( $order->total() >= 500 ) {
@@ -133,26 +130,25 @@ class GiftCardHandler {
 ```
 
 We only ever use this class under very special circumstances, yet we have to create it on every request to pass it to
-the Wordpress hook.
+the WordPress hook.
 
-- Lastly, unit testing ( **yes, wordpress plugins should be unit-tested** ) this code is complicated since it's tightly
-  coupled to Wordpress Core functions which means you either have to bootstrap the entire Wordpress installation during
-  your test set-up or use a Wordpress mocking framework like [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
+- Lastly, unit testing ( **yes, WordPress plugins should be unit-tested** ) this code is complicated since it's tightly
+  coupled to WordPress Core functions which means you either have to bootstrap the entire WordPress installation during
+  your test set-up or use a WordPress mocking framework like [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
   or [WP_Mock](https://github.com/10up/wp_mock). I have used them both, they are great. But it should not be necessary
   to go through such hoops to test a basic event pattern.
 
-#### BetterWpHooks solves all of these problems and provides many more convenience features for a better Wordpress developer experience.
+### BetterWpHooks solves all of these problems and provides many more convenient features for a better WordPress developer experience.
 
 ***
 
 ## Requirements
 
-- BetterWpHooks is a composer package, not a plugin. To be able to use this package you need to
-  have [composer set up](https://getcomposer.org/doc/00-intro.md) in your plugin's root directory.
+- BetterWpHooks is a composer package, not a plugin. To be able to use this package you need to have [composer set up](https://getcomposer.org/doc/00-intro.md) in your plugin's root directory.
 - PHP Version >= 7.3
 
-In theory, you should be able to use this package with some minor modifications with every PHP Version >= 7.0 but I did
-not activly test neither do I recommend
+In theory, you should be able to use this package with some minor modifications with every PHP Version >= 7.0 , but I did
+not actively test it and neither should you be
 using [PHP Versions that are not actively supported anymore](https://www.php.net/supported-versions.php) by the PHP
 maintainers.
 
@@ -170,21 +166,21 @@ From the root directory of your plugin or theme, execute the following command f
 
 ### Terminology
 
-In the following Wordpress actions and filters will be referred to as **events**. Hook callbacks, be it a class or an
-anonymous closure are referred to as **event listeners**.
+In the following WordPress actions and filters will be referred to as **events**. Hook callbacks, be it a class or an
+anonymous closure will be referred to as **event listeners**.
 
 ### Entry Point
 
-BetterWpHooks was built in mind with how the Wordpress plugin ecosystem works. Unlike many other packages that try to
-modernize Wordpress BetterWpHooks **can be used by an unlimited amount of plugins at the same time without conflicts**.
+BetterWpHooks was built in mind with how the WordPress plugin ecosystem works. Unlike many other packages that try to
+modernize WordPress BetterWpHooks **can be used by an unlimited amount of plugins at the same time without conflicts**.
 
 The main entry point to the library is the
 trait `BetterWpHooksFacade`([src](https://github.com/calvinalkan/better-wordpress-hooks/blob/master/src/Traits/BetterWpHooksFacade.php))
 .
 
-By creating a custom class which uses this Trait you gain access to your own instance of the core of the library.
+By creating a custom class that uses this Trait you gain access to your instance of the core of the library.
 
-In the following we are going to assume that we are using this library inside a plugin called **AcmePlugin**.
+In the following, we are going to assume that we are using this library inside a plugin called **AcmePlugin**.
 
 ```php
 use BetterWpHooks\Traits\BetterWpHooksFacade;
@@ -202,37 +198,37 @@ which provides you access to the 3 main collaborators of the library:
 
 ### 1. IoC-Container
 
-To auto-resolve dependencies of event listeners and automaticcly create objects, BetterWpHooks makes use of a Inversion
-of Control (IoC) Container. Since many Wordpress plugins already use a IoC-Container it would make no sense to force the
+To auto-resolve dependencies of event listeners and automatically create objects, BetterWpHooks makes use of an Inversion
+of Control (IoC) Container. Since many WordPress plugins already use an IoC-Container, it would make no sense to force the
 usage of any specific container implementation.
 
 The entire library is dependent on an ``ContainerAdapterInterface`` . By default, an adapter for
 the `illuminate/container` is used. Every feature of the [Illumiante/Container](https://laravel.com/docs/8.x/container)
 is fully supported.
 
-The acutal container implementation can be swapped out by confirming to a simple interface, so you can use any other
+The actual container implementation can be swapped out by confirming to a simple interface, so you can use any other
 container like:
 
 - [Symfony Container](https://symfony.com/doc/current/service_container.html)
 - [Aura](http://auraphp.com/packages/2.x/Di.html)
 - [Dice](https://r.je/dice)
 
-The only constraint is that **auto-resolving ( auto-wiring ) neeeds to be supported by your container!**
+The only constraint is that **auto-resolving ( auto-wiring ) needs to be supported by your container!**
 
 ### 2. Events
 
-Events represent Wordpress Actions and Filters. There is however no need to distinguish between the two. That is taken
+Events represent WordPress Actions and Filters. There is however no need to distinguish between the two. That is taken
 care of under the hood.
 
 There are two ways to use Events with BetterWpHooks:
 
 1. Events as event objects (**recommended**, as it provides way more features)
-2. Similar to Wordpress Actions and Filters but still using the IoC-Container to resolve classes (not-recommended)
+2. Similar to WordPress Actions and Filters but still using the IoC-Container to resolve classes (not-recommended)
 
 ### 3. Event Dispatcher
 
-This is the main class that servers as a layer between your plugin code and the Wordpress Plugin API. Instead of
-directly creating hooks via `add_action` and `add_filter` your create them using the Event Dispatcher.
+This is the main class that servers as a layer between your plugin code and the WordPress Plugin API. Instead of
+directly creating hooks via `add_action` and `add_filter` you create them using the Event Dispatcher.
 
 ### 4. Event Mapper
 
@@ -244,8 +240,8 @@ control over.
 
 ## Bootstrapping
 
-In order to use BetterWpHooks you need to bootstrap it in 3 simple steps. This should be done in your main plugin file
-or any other file that gets executed **before** Wordpress fires its first Hook. You should
+To use BetterWpHooks you need to bootstrap it in 3 simple steps. This should be done in your main plugin file
+or any other file that gets executed **before** WordPress fires its first Hook. You should
 also [require the composer autoloader](https://getcomposer.org/doc/01-basic-usage.md#autoloading) in your main plugin
 file.
 
@@ -261,7 +257,7 @@ use BetterWpHooksFacade;
 }
 ```
 
-**2. Create an instance of the the ``BetterWpHooks`` class that will be mapped to ``AcmeEvents``:**
+**2. Create an instance of the ``BetterWpHooks`` class that will be mapped to ``AcmeEvents``:**
 
 ```php
 AcmeEvents::make();
@@ -273,7 +269,7 @@ AcmeEvents::make($custom_container_adapter);
 
 **3. Map core and 3rd party hooks to custom event objects ( optional but recommended )**.
 
-All that this does is dispatching your custom event object when the WP Hooks is fired. Will see why we do this in a
+All that this does is dispatching your custom event object when the WP Hooks is fired. We'll see why we do this in a
 minute.
 
 ```php
@@ -332,10 +328,10 @@ AcmeEvents::listeners($listeners);
 AcmeEvents::boot();
 ```
 
-**The entire process can also be created as a fluent api**.
+**The entire process can also be created as a fluent API**.
 
-Ideally you would create to plain php files that just return an array of your mapped events and events listeners. This
-way you have all your events nicely in one file instead of being sepereated over your entire codebase.
+Ideally, you would create a plain PHP files that just return an array of your mapped events and events listeners. This
+way you have all your events nicely in one file instead of being separated over your entire codebase.
 
 **Complete example:**
 
@@ -354,8 +350,8 @@ AcmeEvents::make()->mapEvents($mapped)->listeners($listeners)->boot();
 
 Alright, **why would I do all this?** Time for some examples:
 
-Lets assume we are developing a Woocommerce Extension that gives users the possibility to extend their woocommerce store
-with a lot of marketing related features.
+Let's assume we are developing a Woocommerce Extension that gives users the possibility to extend their WooCommerce store
+with several marketing-related features.
 
 One of them being the gift card functionality described in the intro.
 
@@ -368,7 +364,7 @@ action ```woocommerce_checkout_order_processed``` ([src](https://github.com/dipo
 This action hook provides the order_id of the created order and the form submission data. We will create a working
 example of this functionality in incremental steps improving it slowly.
 
-1. Create an event object. Event objects are plain PHP object that do not store any logic.
+1. Create an event object. Event objects are plain PHP objects that do not store any logic.
 
 ```php
 class HighValueOrderCreated extends AcmeEvents {
@@ -412,7 +408,7 @@ class ProcessGitCards {
 }
 ```
 
-3. Wire the Event and Listener. ( The wiring should be done in a seperate, plain php file )
+3. Wire the Event and Listener. ( The wiring should be done in a separate, plain PHP file )
 
 ```php
 require __DIR__ . '/vendor/autoload.php';
@@ -435,16 +431,15 @@ $listeners = [
 AcmeEvents::make()->mapEvents($mapped)->listeners($listeners)->boot();
 ```
 
-**So what happens now when woocommerce creates an order ?**
+**So what happens now when WooCommerce creates an order ?**
 
-1. Wordpress will fire the ``woocommerce_checkout_order_processed`` action.
-2. Since under the hood a custom event was mapped to this action Wordpress will now call a closure that will create a
+1. WordPress will fire the ``woocommerce_checkout_order_processed`` action.
+2. Since under the hood a custom event was mapped to this action WordPress will now call a closure that will create a
    new instance of the ```HighValueOrderCreated``` Event using the **passed arguments from the filter** to construct the
    event object.
 3. The called closure will first create the instance and then dispatch an event ```HighOrderValueCreated::class``` which
    passes the created object as an argument to any registered Listener.
-4. Since we registered a listener for the ``HighOrderValueCreated`` our the ``handleEvent``method on
-   the ``ProcessGiftcards``class is now called. ( See [How it works](#) for a detailed explanation ).
+4. Since we registered a listener for the ``HighOrderValueCreated`` our the ``handleEvent``method on the ``ProcessGiftcards``class is now called. ( See [How it works](#) for a detailed explanation ).
 5. The constructor dependencies ``$mailer, $logger`` are **automatically** injected into the class.
 6. If the ``handleEvent()`` would have any method dependencies besides the event object, those **method dependencies
    would have also been injected automatically.**
@@ -458,8 +453,7 @@ AcmeEvents::make()->mapEvents($mapped)->listeners($listeners)->boot();
 You might have noticed that we have not handled the logic regarding the conditional execution based on the order value
 yet.
 
-1. We apply a ```DispatchesConditionally``` Trait to our ```HighValueOrderCreated``` class. We also give users the
-   choice to define a custom amount for when a giftcard should be sent.
+1. We apply a ```DispatchesConditionally``` Trait to our ```HighValueOrderCreated``` class. We also give users the choice to define a custom amount for when a gift card should be sent.
 
 ```php
 class HighValueOrderCreated extends AcmeEvents {
@@ -482,9 +476,9 @@ class HighValueOrderCreated extends AcmeEvents {
 }}
 ```
 
-Before the Dispatcher dispatches an event that uses this trait the shouldDispatch Method is called and evaluated. If it
-returns false
-**the event will not be fired by Wordpress at all**. It will never hit the Plugin/Hook Api, and **no instance**
+Before the Dispatcher dispatches an event that uses this trait the `shouldDispatch` Method is called and evaluated. If it
+returns false,
+**the event will not be fired by WordPress at all**. It will never hit the Plugin/Hook API and **no instance**
 of ``ProcessGiftCards, Mailer and Logger`` **will be ever be created**.
 
 #### Interfaces instead of concrete implementations.
@@ -494,7 +488,7 @@ In order to not break
 the [Dependency Inversion Principle](https://stackify.com/dependency-inversion-principle/#:~:text=Martin's%20definition%20of%20the%20Dependency,should%20not%20depend%20on%20details.)
 we now use a ``MailerInterface``
 
-Assuming to you are using the default Container Adapter you can now do the following:
+Assuming you are using the default Container Adapter you can now do the following:
 
 ```php
 
@@ -539,11 +533,11 @@ Again: **if the minimum threshold for the total order value is not met, none of 
 is lazy-loaded at runtime.**
 
 I hope both agree that this implementation is cleaner and most importantly, a lot more extendable and maintainable than
-anything we can currently implement in with the Wordpress Plugin/Hook Api.
+anything we can currently implement in with the WordPress Plugin/Hook API.
 
-### Dispatching your own Events:
+### Dispatching your Events:
 
-There are two ways you can dispatch events (hooks) in your own code with BetterWpHooks.
+There are two ways you can dispatch events (hooks) in your code with BetterWpHooks.
 
 1. **Dispatching events as objects.**
 
@@ -552,7 +546,7 @@ There are two ways you can dispatch events (hooks) in your own code with BetterW
 Instead of doing
 
 ```php
-// Code that processes an apointment booking. 
+// Code that processes an appointment booking. 
 
 do_action('booking_created', $book_id, $booking_data );
 ```
@@ -577,7 +571,7 @@ use BetterWpHooksFacade;
 }
 ```
 
-When creating object events all arguments that should be passed to the constructor **have to be wrapped in an array**.
+When creating object events, all arguments that should be passed to the constructor **have to be wrapped in an array**.
 
 This will not work:
 
@@ -591,7 +585,7 @@ Only the ``$book_id`` would be passed to the constructor.
 
 2. **Dispatching events via the** ```AcmeEvents``` **class**
 
-This approach can be uses if you don't want to create a dedicated event object for an event.
+This approach can be used if you don't want to create a dedicated event object for an event.
 
 ```php
 // Code that processes an appointment booking. 
@@ -599,14 +593,14 @@ This approach can be uses if you don't want to create a dedicated event object f
 AcmeEvents::dispatch( 'booking_created', $book_id, $booking_data );
 ```
 
-This is similar to the way ``do_action()`` works but you still get acces to most features of BetterWpHooks like
-auto-resolution of dependencies and the testing-module. However you wont be able to use conditional dispatching of
+This is similar to the way ``do_action()`` works, but you still get access to most features of BetterWpHooks like
+auto-resolution of dependencies and the testing module. However, you won't be able to use conditional dispatching of
 events quite the same as you would when using approach #1.
 
-In addition your listeners would need to accept the same number of parameters that you passed when dispatching the
+Besides, your listeners would need to accept the same number of parameters that you passed when dispatching the
 event. With approach #1 your listeners **always receive one argument only**, the event object instance.
 
-Using the Facade class you have to options to define arguments which both have the same outcome.
+Using the Facade class you have two options to define arguments which both have the same outcome.
 
 ```php
 // These are identical.
@@ -614,12 +608,12 @@ AcmeEvents::dispatch( 'booking_created', [ $book_id, $booking_data ] );
 AcmeEvents::dispatch( 'booking_created',  $book_id, $booking_data  );
 ```
 
-However only **the first passed paramenter must be the identifier of the event you want to dispatch.**
+However, only **the first passed parameter must be the identifier of the event you want to dispatch.**
 ***
 
 #### Dispatching Helpers.
 
-Sometimes you might only ever want to dispatch one of your own events under specific conditions.
+Sometimes you might only ever want to dispatch one of your events under specific conditions.
 
 ```php
 // If we have a big-group appointment we want to send an
@@ -646,9 +640,9 @@ BookingCreated::dispatchUnless( $appointment->participantCount() >= 5, [$appoint
 
 ### Wordpress Filters
 
-Using the default Plugin/Hook API you need to distinguish between unsing ``add_action`` and ```add_filter``` .
-BetterWpHooks takes care of this under the hood. There is no different syntax for defining actions and filters. Lets
-review a simple example where we might want to allow other developers to modify an appointment data created by our
+Using the default Plugin/Hook API you need to distinguish between using ``add_action`` and ```add_filter``` .
+BetterWpHooks takes care of this under the hood. The syntax is the same for defining actions and filters. Let's
+review a simple example where we might want to allow other developers to modify appointment data created by our
 fictive appointment plugin.
 
 ````php
@@ -663,9 +657,9 @@ A third-party developer ( or maybe a paid extension of your plugin ) might now f
 normally would. Example:
 
 ````php
-// When dispatching object events the hook id is always the full classname. 
+// When dispatching object events the hook id is always the full class name. 
 
-add_filter('ApointmentCreated::class', function( AppointmentCreated $event) {
+add_filter('AppointmentCreated::class', function( AppointmentCreated $event) {
     
     $appointment = $event->appointment;
     
@@ -681,7 +675,7 @@ add_filter('ApointmentCreated::class', function( AppointmentCreated $event) {
 } );
 ````
 
-Alternativly you could dispatch the filter like this:
+Alternatively you could dispatch the filter like this:
 
 ````php
 $appointment = AcmeEvents::dispatch( 'acme_appointment_created', $appointment_object );
@@ -697,11 +691,9 @@ Plugin API will be called under the hood.
 
 Default return values are evaluated in the following order:
 
-1. If you are dispatching an event object you can define a ````default()```` method on the event object class. This
-   method will be called if it exists and the returned value will be passed as a default value.
+1. If you are dispatching an event object you can define a ````default()```` method on the event object class. This method will be called if it exists and the returned value will be passed as a default value.
 
-2. If there is no ````default()```` method on the event class but you are dispatching an event object, the object itself
-   will be returned. For the example above the instance of ``AppointmentCreated`` would be returned.
+2. If there is no ````default()```` method on the event class but you are dispatching an event object, the object itself will be returned. For the example above the instance of ``AppointmentCreated`` would be returned.
 
 3. If #1 and #2 are not possible the first parameter passed into the ````dispatch()```` method will be returned.
 
@@ -709,7 +701,7 @@ Default return values are evaluated in the following order:
 
 ### Valid Listeners
 
-A listener, just like with the default Wordpress Plugin/Hook API can be either an anonymous closure a class callable.
+A listener, just like with the default WordPress Plugin/Hook API can either be an anonymous closure or a class callable.
 Any of the following options are valid for creating a listener with the Dispatcher. By default, if no method is
 specified BetterWpHooks will try to call the ````handleEvent()```` method on your listener.
 
@@ -757,13 +749,13 @@ See the section on [custom identifier](#custom-identifiers) for its use cases.
 ### Dependency Resolution
 
 Let's look at a complex example of how dependency resolution works with BetterWpHooks. This is assuming that you are
-using the inbuilt ``Illuminate/Container Adapater``. With other containers there might be slight differences with how
+using the inbuilt ``Illuminate/Container Adapter``. With other containers, there might be slight differences with how
 you need to define method and constructor dependencies.
 
 The ```BookingEventsListener``` shall handle various events regarding Bookings. ( creation, deletion, rescheduling etc.)
 
-When a Booking is canceled we want to notify the hotel owner and the guest and also make an API-call to booking.com to
-update our availability. However we only need the ``BookingcomClient`` in one method of this EventListener lets not make
+When a Booking is cancelled we want to notify the hotel owner and the guest,  and also make an API call to booking.com to
+update our availability. However, we only need the ``BookingcomClient`` in one method of this EventListener let's not make
 it a constructor dependency.
 
 Our class will look like this:
@@ -812,7 +804,7 @@ When the ````BookingCanceled```` event is dispatched the following things happen
 1. The ```SimpleConstructorDependency``` class is instantiated.
 2. Using the ```SimpleConstructorDependency``` the ```ComplexMailerDependency``` is instantiated.
 3. The ```BookingEventsListener``` class is instantiated using the new ```ComplexMailerDependency```.
-4. A new ```BookingcomClient``` is instantiated.
+4. A new ``` BookingcomClient``` is instantiated.
 5. The ```bookingCanceled()```method is called passing in the dispatched event object and the ```BookingcomClient```.
 
 **Method arguments that are created from the dispatched event should always be declared first in the method signature
@@ -822,7 +814,7 @@ before any other dependencies**.
 
 ### Conditional Event Dispatching
 
-This is meant to be used for actions and filters whose triggering are not under your control. (ie. core or third-party
+This is meant to be used for actions and filters whose triggering are not under your control. ( i.e. core or third-party
 plugin hooks).
 
 For events that you control it's easier to just use the ````dispatchIf```` and ````dispatchUnless```` helpers. However,
@@ -854,12 +846,12 @@ class HighOrderValueCreated {
     }}
 ````
 
-The return value of the ````shouldDispatch```` method is evaluated every time **before** the anything is executed.
-If ```FALSE``` is returned, the Wordpress Plugin/API will never be hit, neither will any class get instantiated.
+The return value of the ````shouldDispatch```` method is evaluated every time **before** anything is executed.
+If ```FALSE``` is returned, the WordPress Plugin/API will never be hit, neither will any class get instantiated.
 
 ### Conditional Event Listening
 
-In some cases it might be useful to determine at runtime if a listener should handle an Event.
+In some cases, it might be useful to determine at runtime if a listener should handle an Event.
 
 Let's consider the following fictive Use case:
 
@@ -868,10 +860,9 @@ Let's consider the following fictive Use case:
 1. Notify the responsible staff member via Slack.
 2. Send a confirmation email to the customer
 3. Add the customer to an external SaaS like Mailchimp.
-4. **If** the customer booked an appointment with a total value greater than $300 you also want to notify the business
-   owner via SMS, so he can personally attend the client.
+4. **If** the customer booked an appointment with a total value greater than $300 you also want to notify the business owner via SMS, so he can personally serve the client.
 
-So how could be do this?
+So how could we do this?
 
 Our code dispatches an event every time an appointment is created:
 
@@ -903,9 +894,9 @@ This is where we can use **conditional event listeners**
 
 We define the ```NotifyBusinessOwner``` listener like this with the trait ``ListensConditionally``
 
-When a listener has this trait, **before** calling the defined method ( here its ``handleEvent()`` ) the return value
+When a listener has this trait, **before** calling the defined method ( here it's ``handleEvent()`` ) the return value
 of ``shouldHandle``is evaluated. If false is returned the method will not be executed and the ```$event``` object will
-get passed unchanged to the next listeners ( if there are any ).
+get passed to the next listeners unchanged ( if there are any ).
 
 ````php
 class NotifyBusinessOwner {
@@ -924,7 +915,7 @@ class NotifyBusinessOwner {
     
     public function handleEvent ( AppointmentCreated $event ) {
     
-        $business_owner_phone_number = $this->config->get('primary_phone_numbe');
+        $business_owner_phone_number = $this->config->get('primary_phone_number');
      
         $this->sms_client->notify($business_owner_phone_number, $event->appointment);
         
@@ -946,8 +937,7 @@ listener use the ```StopsPropagation``` Trait.
 
 **Caveats:**
 This will remove every listener registered by **your instance of `BetterWpHooks`** for the current request. The order in
-which listeners were registered does not matter. The first listener that is registered with the ``StopsPropagation``
-Trait will be called, while every other listener will be removed for the current request.
+which listeners were registered does not matter. The first registered listener that is using the ``StopsPropagation`` Trait will be called, while every other listener will be removed for the current request.
 
 ````php
 $listeners = [
@@ -968,7 +958,7 @@ during the current request.
 
 ## API
 
-In theory, you should not have the need to use the underlying service classes provided to you by your ``AcmeEvents``
+In theory, you should not need to use the underlying service classes provided to you by your ``AcmeEvents``
 class outside the [bootstrapping](#bootstrapping) process.
 
 If that need arises, BetterWpHooks makes it easy to do so.
@@ -976,13 +966,13 @@ If that need arises, BetterWpHooks makes it easy to do so.
 Your class ``AcmeEvents`` ( see [Entry-Point](#entry-point) ) serves as Facade to the underlying services, pretty
 similar to how [Laravel Facades](https://laravel.com/docs/8.x/facades) work.
 
-Every static method call is not actually static but resolves to the underlying ```BetterWpHooks``` instance of your
+Every static method call is not static but resolves to the underlying ```BetterWpHooks``` instance of your
 class using PHP's
 ```_callStatic()``` magic-method.
 
 There is a dedicated
 class ````Mixin```` ( [src](https://github.com/calvinalkan/better-wordpress-hooks/blob/master/src/Mixin.php)) that
-provides IDE-autocompletion and also serves as documentation of the methods that are available.
+provides IDE-autocompletion and also serves as documentation of the available methods.
 
 #### Container
 
@@ -1025,9 +1015,9 @@ function ````remove_filter()````, which is fine in most cases. However, if the i
 might not be completely obvious and will most likely cause your plugin to be broken you can mark a listener as
 unremovable using the ``unremovable()`` method instead of ```listen()```.
 
-The listener will now be unremovable through your ``AcmeEvents`` class and the only other possiblity would be to guess
+The listener will now be unremovable through your ``AcmeEvents`` class, and the only other possibility would be to guess
 the exact  ``spl_object_hash()`` since that
-is [how Wordpress creates hook-ids](https://github.com/WordPress/WordPress/blob/b70c00d6acd441af54342f147ab3db1b840632e5/wp-includes/plugin.php#L916)
+is [how WordPress creates hook-ids](https://github.com/WordPress/WordPress/blob/b70c00d6acd441af54342f147ab3db1b840632e5/wp-includes/plugin.php#L916)
 .
 
 `````php
@@ -1059,8 +1049,8 @@ The following combinations are valid ways to search for a registered listener.
 AcmeEvents::forgetOne( Event1::class, Listener1::class . '@foobar');
 `````
 
-**The combination of class and method has to be a match**. Only the class is not enough. However you can forget a
-listner by only passing the classname if you registered the listener with the default ``handleEvent()`` method.
+**The combination of class and method has to be a match**. Only the class is not enough. However, you can forget a
+listener by only passing the class name if you registered the listener with the default ``handleEvent()`` method.
 
 #### Deleting a listener for an event.
 
@@ -1085,7 +1075,7 @@ AcmeEvents::listen( Event1::class, [ 'custom_id' => Listener1::class . '@foobar'
 AcmeEvents::forgetOne( Event1::class, 'custom_id' );
 
 
-// This will also work with closures which is impossible with the default Wordpress Plugin API
+// This will also work with closures which is impossible with the default WordPress Plugin API
 AcmeEvents::listen( Event1::class, [ 'closure_key' => function ( Event1 $event ) {
 
        // do stuff 
@@ -1099,21 +1089,21 @@ AcmeEvents::forgetOne( Event1::class, 'closure_key' );
 
 ## Inbuilt Testing Module
 
-In order to unit test code in the context of Wordpress, one should not have to bootstrap the entire Wordpress Core.
-There are two great Wordpress mocking libraries out there:
+To unit test code in the context of WordPress, one should not have to bootstrap the entire WordPress Core.
+There are two great WordPress mocking libraries out there:
 
-- [Brain Monkey](https://github.com/Brain-WP/BrainMonkey) and
+- [Brain Monkey](https://github.com/Brain-WP/BrainMonkey)
 - [WP_Mock](https://github.com/10up/wp_mock).
 
 Both are great and work. I have used them both before. But it never felt right to have to use a dedicated mocking
-framework just so that all the code does not blow up, because Wordpress Core functions are undefined.
+a framework just so that all the code does not blow up, because WordPress Core functions are undefined.
 
 Inspired by the way Laravel handles [event testing](https://laravel.com/docs/8.x/mocking#event-fake), BetterWpHooks was
 built with testing in mind before the first line of code was written.
 
-There are two ways you can use the testing-module with BetterWpHooks:
+There are two ways you can use the testing module with BetterWpHooks:
 
-**1. Completely swapping out the underlying dispatcher with a fake-dispatcher:** Using this option none of your
+**1. Completely swapping out the underlying dispatcher with a fake dispatcher:** Using this option none of your
 registered listeners will be executed.
 
 ````php
@@ -1147,7 +1137,7 @@ class OrderTest extends \PHPUnit\Framework\TestCase
 }
 ````
 
-You can also pass a closure to the `assertDispatched` or assertNotDispatched` methods in order to assert that an event
+You can also pass a closure to the `assertDispatched` or assertNotDispatched` methods to assert that an event
 was dispatched that passes a given "truth test".
 
 ````php
@@ -1161,19 +1151,19 @@ AcmeEvents::assertDispatched(function (OrderShipped $event) use ($order) {
 **2. Only faking a subset of events:** If you are doing Integration Testing, but you still want to fake some events, (
 maybe because they are talking to a slow or unstable external API ) you might do the following:
 
-1. Create a test which extends `BetterWpHooksTestCase`
+1. Create a test that extends `BetterWpHooksTestCase`
 2. In the `setUp` method of your test, call `$this->setUpWp`
 3. In the `tearDown` method of you test, `$this->tearDownWp`
 
 `BetterWpHooksTestCase` extends `\PHPUnit\Framework\TestCase` and takes care of loading all **only**
-the Wordpress Hook API. Loading single pieces of WordPress is a dangerous and brittle endeavour, which is why we created
+the WordPress Hook API. Loading single pieces of WordPress is a dangerous and brittle endeavour, which is why we created
 a
-stand-alone [repo that exactly mirrors the Wordpress Hook API](https://github.com/calvinalkan/wordpress-hook-api-clone).
-This repo is manually synced for every Wordpress release.
+stand-alone [repo that exactly mirrors the WordPress Hook API](https://github.com/calvinalkan/wordpress-hook-api-clone).
+This repo is manually synced for every WordPress release.
 
 `BetterWpHooksTestCase` also takes care of clearing the global state before and after every test.
 
-You get the full features of the Wordpress Hook API but your tests will still run blazing fast.
+You get the full features of the WordPress Hook API, but your tests will still run blazing fast.
 
 Let's assume we want to test the following method.
 
@@ -1257,7 +1247,7 @@ class OrderProcessTest extends \BetterWpHooks\Testing\BetterWpHooksTestCase {
 ````
 
 The `$this->bootstrapAcmeEvents();` can be anything you want, but if you want your listeners to execute you need to properly [bootstrap your `AcmeEvents`instance](#bootstrapping).
-Its recommended that you create a custom factory class and **dont bootstrap your instance in your main plugin file.** so you maintain greater testing flexibility.
+It's recommended that you create a custom factory class and **don't bootstrap your instance in your main plugin file.**, so you maintain greater testing flexibility.
 
 ## How it works
 
@@ -1276,7 +1266,7 @@ array key inside the global `$wp_filter['tag']` associative array and calls the 
 A callback can either be:
 
 - an anonymous function
-- a `[ CallbackClass::class, 'method' ]` combination, where ``method`` needs to be static in order to not cause
+- a `[ CallbackClass::class, 'method' ]` combination, where ``method`` needs to be static to not cause
   deprecation errors.
 - a `[ new CallbackClass(), 'method' ]` combination, where the handling class is already instantiated. This is the most
   commonly used way in combination with adding hooks in the constructor:
@@ -1300,7 +1290,7 @@ A callback can either be:
 The ```WordpressDispatcher``` class is responsible for dispatching events. You have access to an instance of this class
 via your ``AcmeEvents``Facade.
 
-This is a simplyfied version of the responsible `dispatch` method.
+This is a simplified version of the responsible `dispatch` method.
 
 ````php
 public function dispatch( $event, ...$payload ) {
@@ -1334,15 +1324,14 @@ public function dispatch( $event, ...$payload ) {
                         
         }
 		
-	// If we make it this far, only here do we hit the Wordpress Plugin API.
+	// If we make it this far, only here do we hit the WordPress Plugin API.
         return $this->hook_api->applyFilter( $event, $payload );
 			
 			
 }
 ````
 
-As the code example demonstrates the Wordpress Plugin API is used, but through the layer of abstraction BetterWpHooks is
-able to introduce most of its before we actually hit the Plugin API. We also might never hit
+Like the example demonstrates, the WordPress Plugin API is used, but through the layer of abstraction, BetterWpHooks can introduce most of its before we hit the Plugin API. We also might never hit
 it [if conditions are not met](#conditional-event-dispatching)
 
 If all conditions were to pass, the following method call:
@@ -1360,7 +1349,7 @@ $booking = new Booking($booking_data);
 add_action('acme_booking_created', $booking );
 ````
 
-Now, Wordpress would call all the registered Hook Callbacks which brings us to:
+Now, WordPress would call all the registered Hook Callbacks which brings us to:
 
 ### How Listeners are called.
 
@@ -1369,7 +1358,7 @@ Now, Wordpress would call all the registered Hook Callbacks which brings us to:
 BetterWpHooks serves as a layer between your plugin code and the Plugin API. It still uses the Plugin API but in a
 different way.
 
-There are 3 types of Listeners BetterWpHooks creates under the hood depending of what you registered:
+There are 3 types of Listeners BetterWpHooks creates under the hood depending on you defined them during the bootstrapping process.
 
 - Closure Listeners
 - Instance Listeners
@@ -1379,7 +1368,7 @@ The difference between Instance Listeners and Class Listeners is, that an Instan
 instantiated class ( because you passed it in ).
 
 No matter which type of Listener is created, **they are all wrapped inside an anonymous closure** which is then passed
-to the Wordpress Plugin API.
+to the WordPress Plugin API.
 
 This happens inside the ``ListenerFactory`` class.
 
@@ -1387,7 +1376,7 @@ This happens inside the ``ListenerFactory`` class.
 
 /**
  * Wraps the created abstract listener in a closure.
- * The Wordpress Hook Api will save this closure as
+ * The WordPress Hook Api will save this closure as
  * the Hook Callback and execute it at runtime.
  *
  * @param  \BetterWpHooks\Contracts\AbstractListener  $listener
@@ -1417,24 +1406,25 @@ private function wrap( AbstractListener $listener ): Closure {
 }
 ````
 
-Wordpress **does not directly call the class callable**. It only knows about the anonymous closure which when executed
+WordPress **does not directly call the class callable**. It only knows about the anonymous closure which when executed
 will execute the listener [if conditions are met](#conditional-event-listening).
 
-Like this we can achieve lazy instantiation of objects and put an IoC-Container in between Wordpress and the Listener.
+Like this, we can achieve lazy instantiation of objects and put an IoC-Container in between WordPress and the Listener.
 The actual building of the ```$listener``` happens inside the ``execute()`` method which is defined in
 the ``AbstractListener`` class and differs a bit for every listener type.
 
 ## Compatibility
 
-BetterWpHooks is 100% compatible with how the Wordpress Plugin/Hook API works. 
+BetterWpHooks is 100% compatible with how the WordPress Plugin/Hook API works.
 
-- No Core files get modified.
-- No custom Event/Observer pattern is introduced. Actions and Filters are executed exactly the same way as they normally would.
-- **Can be used by any amount of plugins on the same site.** Since every plugin creates its own Facade via the `BetterWpHooksFacade` Trait, there will never be a case where two plugins try to do conflicting stuff with the Dispatcher or the IoC-Container. 
-- **Third-Party developers can create custom hooks for your events the same way they normally would** using `add_action`, `add_filter` . Arguably its even easier since callbacks will receive just one parameter, so that they don't have to search the docs for the amount of paramenters they need to use. 
-- Additional features: It's very easy to allow for removable/customization for advanced usage. Normally with Wordpress, it would be very hard, to remove a hook callback that uses an instantiated object as the hook callback, because Wordpress uses `spl_object_hash()` to store the hook_id. The same goes for closures. 
-If you like, you could provide your own custom functions to interact with your `BetterWpHooksFacade` instance. For example:
- 
+- No core files get modified.
+- No custom Event/Observer pattern is introduced. Actions and Filters are executed the same way as they normally would.
+- **Can be used by any amount of plugins on the same site.** Since every plugin creates its Facade via the `BetterWpHooksFacade` Trait, there will never be a case where two plugins try to do conflicting stuff with the Dispatcher or the IoC-Container.
+- **Third-Party developers can create custom hooks for your events the same way they normally would** using `add_action`, `add_filter` . Arguably it's even easier since callbacks will receive just one parameter so that they don't have to search the docs for the number of parameters they need to use.
+- Additional features: It's very easy to allow the removal/customization of hooks for advanced users. Normally with WordPress, it would be very hard, to remove a hook, that uses an instantiated object as the hook callback, because WordPress uses `spl_object_hash()` function to store the hook_id. The same goes for closures. There are even [dedicated packages trying to solve this exact problem](https://github.com/inpsyde/objects-hooks-remover), removing plugin hooks when objects or closures are used.
+  With BetterWpHooks this becomes quite easy for users that want to customize your plugin.
+  If you like, you could provide your own custom functions to interact with your `BetterWpHooksFacade` instance. For example:
+
 ```php 
 if ( ! function_exists('acme_remove_filter') {
     function acme_remove_filter($tag, $callback) {
@@ -1450,22 +1440,22 @@ acme_remove_filter(Event1::class, Listener1::class);
 // This works. 
 add_filter(Event1::class, ThridPartyListener::class)
 ```
-
+No more accessing the global `$wp_filter` or editing source files because hooks are unremovable. You also don't have to remember the hook priority like you would when trying to remove a hook with `remove_filter()` .
 
 
 ## TO-DO
 
 - Move the documentation to a dedicated site.
-- Improve grammar and spelling of README.md ( I'm German ) - **pull requests are very welcome.** 
+- Improve grammar and spelling of README.md ( I'm German ) - **pull requests are very welcome.**
 
 ## Contributing
 
-BetterWpHooks is completely open source and everybody is encouraged to participate by:
+BetterWpHooks is completely open-source and everybody is encouraged to participate by:
 
 - Reviewing `CONTRIBUTING.md`
 - ⭐ the project on GitHub ([https://github.com/calvinalkan/better-wordpress-hooks](https://github.com/calvinalkan/better-wordpress-hooks))
 - Posting bug reports ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
-- (Emailing security issues to [calvin@snicco.de](calvin@snicco.de) instead)
+- (Emailing security issues to [calvin@snicco.de](mailto:calvin@snicco.de) instead)
 - Posting feature suggestions ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
 - Posting and/or answering questions ([https://github.com/calvinalkan/better-wordpress-hooks/issues](https://github.com/calvinalkan/better-wordpress-hooks/issues))
 - Submitting pull requests ([https://github.com/calvinalkan/better-wordpress-hooks/pulls](https://github.com/calvinalkan/better-wordpress-hooks/pulls))
@@ -1476,6 +1466,5 @@ BetterWpHooks is completely open source and everybody is encouraged to participa
 
 ## Credits
 
-- ``Laravel Framework``: While not depending on
-  the [Illuminate/Events](https://packagist.org/packages/illuminate/events) package, BetterWpHooks was heavily inspired
-  by the way Laravel handles event dispatching. Especially the testing-features are extremly close to the [laravel testing features](https://github.com/illuminate/support/blob/master/Testing/Fakes/EventFake.php).
+- ``Laravel Framework`` While not depending on
+  the [Illuminate/Events](https://packagist.org/packages/illuminate/events) package, BetterWpHooks was heavily inspired by the way Laravel handles event dispatching. Especially the testing features are very close to the [laravel testing features](https://github.com/illuminate/support/blob/master/Testing/Fakes/EventFake.php).
