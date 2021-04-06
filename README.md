@@ -1424,7 +1424,7 @@ BetterWpHooks is 100% compatible with how the WordPress Plugin/Hook API works.
 - Additional features: It's very easy to allow the removal/customization of hooks for advanced users. Normally with WordPress, it would be very hard, to remove a hook, that uses an instantiated object as the hook callback, because WordPress uses the `spl_object_hash()` function to store the hook_id. The same goes for closures. There are even [dedicated packages trying to solve this exact problem](https://github.com/inpsyde/objects-hooks-remover), removing plugin hooks when objects or closures are used.
   With BetterWpHooks this becomes quite easy for users that want to customize your plugin.
   If you like, you could provide your own custom functions to interact with your `BetterWpHooksFacade` instance. For example:
-
+  
 ```php 
 if ( ! function_exists('acme_remove_filter') {
     function acme_remove_filter($tag, $callback) {
@@ -1442,6 +1442,25 @@ add_filter(Event1::class, ThridPartyListener::class)
 ```
 No more accessing the global `$wp_filter` or editing source files because hooks are unremovable. You also don't have to remember the hook priority like you would when trying to remove a hook with `remove_filter()` .
 
+**One caveat:**
+
+If you are using this library, or any other third-party dependency for that matter in a plugin that you plan on distributing on WordPress.org there is the risk of running into conflicts, when two 
+plugins require the same dependency but bundle it in different versions. 
+
+The composer autoloader will only load the version that is first required. Since WordPress loads plugins alphabetically there might be issues if your plugin relies on features, that are only implemented in newer versions of a dependency, while the plugin that was first loaded required an older version.
+
+**This is not an issue of composer, nor of this library**, but from WordPress still not having a dedicated solution for dependency management in 2021. 
+
+Until WordPress finds are way to solve this, the only way to be 100% is to wrap every dependecy that your plugin has in your own namespace (...yikes again).
+
+However, there are projects that facilitate this process: 
+
+- [imposter-plugin](https://github.com/Typisttech/imposter-plugin)
+- [mozart](https://github.com/coenjacobs/mozart)
+
+For further info on this matter check out this article and **especially the comment section.** 
+
+[https://wppusher.com/blog/a-warning-about-using-composer-with-wordpress/](https://wppusher.com/blog/a-warning-about-using-composer-with-wordpress/)
 
 ## TO-DO
 
