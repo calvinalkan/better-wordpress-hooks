@@ -1467,6 +1467,7 @@ For further info on this matter check out this article and **especially the comm
 ## TO-DO
 
 - Move the documentation to a dedicated site.
+- Add option to specify a custom error message when someone tries to remove an unremovable listener. 
 - Improve grammar and spelling of README.md ( I'm German ) - **pull requests are very welcome.**
 
 ## Contributing
