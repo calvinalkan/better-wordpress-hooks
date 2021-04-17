@@ -13,7 +13,7 @@
   "require": {
     "php": "^7.3",
     "illuminate/support": "8.35.1",
-    "calvinalkan/base-container": "dev-master"
+    "calvinalkan/base-container": "0.1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
