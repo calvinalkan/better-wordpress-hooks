@@ -4,28 +4,27 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2f903f07004ac48c6236dd0da4e75508",
+    "content-hash": "719a606d09218e4df023ca807e64bfe5",
     "packages": [
         {
             "name": "calvinalkan/base-container",
-            "version": "dev-master",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/calvinalkan/base-container.git",
-                "reference": "003a44bee0c644cff906ae381e29fe97f3b55a82"
+                "reference": "f3a1f0a29e3b02d549bd4e17da43d0d72ce41f95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/calvinalkan/base-container/zipball/003a44bee0c644cff906ae381e29fe97f3b55a82",
-                "reference": "003a44bee0c644cff906ae381e29fe97f3b55a82",
+                "url": "https://api.github.com/repos/calvinalkan/base-container/zipball/f3a1f0a29e3b02d549bd4e17da43d0d72ce41f95",
+                "reference": "f3a1f0a29e3b02d549bd4e17da43d0d72ce41f95",
                 "shasum": ""
             },
             "require": {
                 "calvinalkan/interfaces": "0.1.0",
-                "illuminate/container": "^8.0",
+                "illuminate/container": "8.35.1",
                 "php": "^7.3"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -46,9 +45,9 @@
             "homepage": "https://github.com/calvinalkan/base-container/",
             "support": {
                 "issues": "https://github.com/calvinalkan/base-container/issues",
-                "source": "https://github.com/calvinalkan/base-container/tree/master"
+                "source": "https://github.com/calvinalkan/base-container/tree/0.1.1"
             },
-            "time": "2021-04-04T23:07:25+00:00"
+            "time": "2021-04-17T01:12:09+00:00"
         },
         {
             "name": "calvinalkan/interfaces",
@@ -4716,7 +4715,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "calvinalkan/base-container": 20,
         "codeception/assert-throws": 20,
         "calvinalkan/wordpress-hook-api-clone": 20
     },
