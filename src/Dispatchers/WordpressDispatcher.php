@@ -215,20 +215,38 @@
 			if ( ! $this->hasListeners( $event ) ) {
 				
 				
-				if ( is_callable( [ $payload, 'default' ] ) ) {
-					return $payload->default();
-				}
-				
-				return is_object( $payload ) ? $payload : $payload[0];
+				return $this->determineDefault($payload);
 				
 				
 			}
-			
-			return $this->hook_api->applyFilter( $event, $payload );
+
+
+
+			$filtered = $this->hook_api->applyFilter( $event, $payload );
+
+			if ( $filtered === $payload ) {
+
+			    return $this->determineDefault($payload);
+
+            }
+
+			return $filtered;
 			
 			
 		}
-		
+
+		private function determineDefault( $payload) {
+
+            if ( is_callable( [ $payload, 'default' ] ) ) {
+
+                return $payload->default();
+
+            }
+
+            return is_object( $payload ) ? $payload : $payload[0];
+
+        }
+
 		/**
 		 * Parse the given event and payload and prepare them for dispatching.
 		 * If the event that got dispatched is an object we will use the classname as the event and
@@ -252,8 +270,7 @@
 			
 			
 		}
-		
-		
+
 		/**
 		 *
 		 * Searches the first registered listener that implements
@@ -400,8 +417,7 @@
 			return $this->aliases[ $event ][ $key ] ?? classNameIfClassExists( $callable );
 			
 		}
-		
-		
+
 		/**
 		 * Uses the alias of the listener to find and return
 		 * the object hash of the listener callable
@@ -471,8 +487,7 @@
 			}
 			
 		}
-		
-		
+
 		/**
 		 *
 		 * Checks if a registered closure is marked as unremovable

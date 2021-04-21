@@ -803,8 +803,7 @@
 			
 			
 		}
-		
-		
+
 		/** @test */
 		public function the_payload_is_not_changed_when_a_listener_does_not_listen_at_runtime() {
 			
@@ -1043,7 +1042,38 @@
 			
 			
 		}
-		
+
+		/** @test */
+        public function if_listeners_are_present_but_none_of_them_handles_the_event_conditionally_the_default_value_is_returned_for_object_events()
+        {
+
+            // Class Listener
+            $_SERVER['should_handle'] = FALSE;
+
+            $this->dispatcher->listen( FilterableEvent::class, ConditionalListener::class . '@foobar' );
+
+            $result = $this->dispatcher->dispatch( new FilterableEvent( 'foobar' ) );
+
+            $this->assertSame( 'foobar', $result );
+
+
+        }
+
+        /** @test */
+        public function if_listeners_are_present_but_none_of_them_handles_the_event_conditionally_the_default_value_is_returned_for_non_object_events()
+        {
+
+            // Class Listener
+            $_SERVER['should_handle'] = FALSE;
+
+            $this->dispatcher->listen( 'event', ConditionalListener::class . '@foobar' );
+
+            $value1 = $this->dispatcher->dispatch( 'event', 'foo', 'bar', 'baz' );
+
+            $this->assertEquals( 'foo', $value1 );
+
+
+        }
 		
 		private function reset(): void {
 			
