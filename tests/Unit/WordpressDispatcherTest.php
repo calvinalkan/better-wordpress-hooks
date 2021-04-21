@@ -821,7 +821,34 @@
 			
 			
 		}
-		
+
+		/** @test */
+        public function should_listen_gets_called_even_when_the_listener_got_created_as_a_string_callable()
+        {
+
+            // Class Listener
+            $_SERVER['should_handle'] = TRUE;
+
+            $this->dispatcher->listen( 'event', ConditionalListener::class . '@foobar' );
+
+            $this->dispatchAndAssertAction( 'event', 'foo', [ ConditionalListener::class . '@foobar', 'foobar' ] );
+
+            $this->reset();
+
+
+            // Nothing
+            $_SERVER['should_handle'] = FALSE;
+
+            $this->dispatcher->listen( 'event',  ConditionalListener::class . '@foobar'  );
+
+            $this->dispatchAndAssertNoActionDone( 'event', 'foo', [
+                ConditionalListener::class . '@foobar',
+                'foobar',
+            ] );
+
+            unset( $_SERVER['should_handle'] );
+
+		}
 		
 		
 		/**
