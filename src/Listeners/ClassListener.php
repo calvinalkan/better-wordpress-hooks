@@ -4,7 +4,7 @@
 	
 	use BetterWpHooks\Contracts\AbstractListener;
 	use BetterWpHooks\Traits\ReflectsCallable;
-	use Contracts\SniccoContainerAdapter;
+	use Contracts\ContainerAdapter;
 	
 	use function BetterWpHooks\Functions\normalizeClassMethod;
 	
@@ -18,11 +18,11 @@
 		private $class_callable;
 		
 		/**
-		 * @var \Contracts\SniccoContainerAdapter
+		 * @var \Contracts\ContainerAdapter
 		 */
 		private $container;
 		
-		public function __construct( array $listener, SniccoContainerAdapter $container ) {
+		public function __construct( array $listener, ContainerAdapter $container ) {
 			
 			$this->class_callable = array_values( $listener );
 			$this->container      = $container;

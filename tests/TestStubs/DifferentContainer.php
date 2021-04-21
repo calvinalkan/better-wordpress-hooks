@@ -2,9 +2,10 @@
 	
 	namespace Tests\TestStubs;
 	
-	use Contracts\SniccoContainerAdapter;
+	use Closure;
+    use Contracts\ContainerAdapter;
 	
-	class DifferentContainer implements SniccoContainerAdapter {
+	class DifferentContainer implements ContainerAdapter {
 		
 		/**
 		 * @param  mixed  $offset
@@ -78,5 +79,15 @@
 		public function call( $callable, array $parameters = [] ) {
 		
 		}
-		
-	}
+
+        public function bind($abstract, $concrete)
+        {
+            // TODO: Implement bind() method.
+        }
+
+        public function singleton($abstract, $concrete)
+        {
+            // TODO: Implement singleton() method.
+        }
+
+    }

@@ -55,8 +55,7 @@
 			function isClosure( $object ): bool {
 				
 				return $object instanceof Closure;
-				
-				
+
 			}
 			
 		

@@ -10,7 +10,7 @@
     use BetterWpHooks\Mappers\WordpressEventMapper;
     use BetterWpHooks\Testing\FakeDispatcher;
     use BetterWpHooks\WordpressApi;
-    use Contracts\SniccoContainerAdapter;
+    use Contracts\ContainerAdapter;
     use SniccoAdapter\BaseContainerAdapter;
 
     use function BetterWpHooks\Functions\hasTrait;
@@ -30,7 +30,7 @@
          */
         public static $instance = NULL;
 
-        public static function make ( SniccoContainerAdapter $container_adapter = NULL ) : ?BetterWpHooks
+        public static function make ( ContainerAdapter $container_adapter = NULL ) : ?BetterWpHooks
         {
 
 
@@ -225,7 +225,7 @@
         }
 
 
-        private static function createInstance ( SniccoContainerAdapter $container_adapter = NULL ) : BetterWpHooks
+        private static function createInstance ( ContainerAdapter $container_adapter = NULL ) : BetterWpHooks
         {
 
             $container_adapter = $container_adapter ?? new BaseContainerAdapter();

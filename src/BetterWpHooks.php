@@ -6,14 +6,14 @@
 	use BetterWpHooks\Contracts\Dispatcher;
 	use BetterWpHooks\Exceptions\ConfigurationException;
 	use BetterWpHooks\Mappers\WordpressEventMapper;
-	use Contracts\SniccoContainerAdapter;
+	use Contracts\ContainerAdapter ;
 	use Illuminate\Support\Arr;
 	
 	class BetterWpHooks {
 		
 		
 		/**
-		 * @var SniccoContainerAdapter
+		 * @var ContainerAdapter
 		 */
 		private $container_adapter;
 		
@@ -30,7 +30,7 @@
 		private $listen = [];
 		private $mapped_events = [];
 		
-		public function __construct(  SniccoContainerAdapter $container_adapter,  Dispatcher $dispatcher,
+		public function __construct(  ContainerAdapter $container_adapter,  Dispatcher $dispatcher,
 			EventMapper $event_mapper ) {
 			
 			$this->container_adapter = $container_adapter;
@@ -64,7 +64,7 @@
 			
 		}
 		
-		public function container(): SniccoContainerAdapter {
+		public function container(): ContainerAdapter {
 			
 			return $this->container_adapter;
 			

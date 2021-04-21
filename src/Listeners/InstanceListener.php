@@ -4,7 +4,7 @@
 	
 	use BetterWpHooks\Contracts\AbstractListener;
 	use BetterWpHooks\Traits\ReflectsCallable;
-	use Contracts\SniccoContainerAdapter;
+	use Contracts\ContainerAdapter;
 	
 	class InstanceListener extends AbstractListener {
 		
@@ -16,11 +16,11 @@
 		private $instance;
 		
 		/**
-		 * @var \Contracts\SniccoContainerAdapter
+		 * @var \Contracts\ContainerAdapter
 		 */
 		private $container;
 		
-		public function __construct( array $instance, SniccoContainerAdapter $container ) {
+		public function __construct( array $instance, ContainerAdapter $container ) {
 			
 			$this->instance  = array_values( $instance );
 			$this->container = $container;

@@ -4,7 +4,7 @@
 	
 	use BetterWpHooks\Contracts\AbstractListener;
 	use BetterWpHooks\Traits\ReflectsCallable;
-	use Contracts\SniccoContainerAdapter;
+	use Contracts\ContainerAdapter;
 	
 	class ClosureListener extends AbstractListener {
 		
@@ -16,11 +16,11 @@
 		private  $closure;
 		
 		/**
-		 * @var \Contracts\SniccoContainerAdapter
+		 * @var \Contracts\ContainerAdapter
 		 */
 		private  $container;
 		
-		public function __construct( \Closure $closure, SniccoContainerAdapter $container) {
+		public function __construct( \Closure $closure, ContainerAdapter $container) {
 			
 			$this->closure = $closure;
 			$this->container = $container;

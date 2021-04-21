@@ -7,11 +7,12 @@
 	use BetterWpHooks\Exceptions\InvalidListenerException;
 	use BetterWpHooks\Exceptions\ExecutionErrorHandler;
 	use BetterWpHooks\Listeners\ClassListener;
+
 	use BetterWpHooks\Listeners\ClosureListener;
 	use BetterWpHooks\Listeners\InstanceListener;
 	use BetterWpHooks\Traits\ReflectsCallable;
 	use Closure;
-	use Contracts\SniccoContainerAdapter;
+	use Contracts\ContainerAdapter;
 	use Illuminate\Support\Arr;
 	use Illuminate\Support\Reflector;
 	use Illuminate\Support\Str;
@@ -34,7 +35,7 @@
 		private $error_handler;
 		
 		
-		public function __construct( SniccoContainerAdapter $container = NULL, ErrorHandler $error_handler = NULL ) {
+		public function __construct( ContainerAdapter $container = NULL, ErrorHandler $error_handler = NULL ) {
 			
 			$this->container = $container ?? new BaseContainerAdapter();
 			
@@ -120,9 +121,7 @@
 					$this->error_handler->handle($e);
 					
 				}
-				
-				
-				
+
 				
 			};
 			
