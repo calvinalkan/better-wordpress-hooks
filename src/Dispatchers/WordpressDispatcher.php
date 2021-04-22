@@ -103,7 +103,7 @@
 		
 		/**
 		 * @param  string        $event
-		 * @param  string|array  $callable
+		 * @param  string|array|Closure  $callable
 		 *
 		 * @throws \Exception
 		 * @api

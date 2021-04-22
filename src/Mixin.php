@@ -73,7 +73,7 @@ final class Mixin
      * Register an event listener with the dispatcher.
      *
      * @param string $event
-     * @param string|array $callable
+     * @param string|array|\Closure $callable
      *
      * @return void
      * @throws \Exception
