@@ -17,6 +17,9 @@
 	use Tests\TestDependencies\ComplexListener;
 	use Tests\TestDependencies\ComplexMethodDependency;
 	use Tests\TestEvents\ConditionalEvent;
+    use Tests\TestEvents\EventWithDefaultLogic;
+    use Tests\TestEvents\EventWithDefaultNoTypeHit;
+    use Tests\TestEvents\EventWithDefaults;
     use Tests\TestEvents\EventWithoutParameters;
     use Tests\TestEvents\FilterableWithoutDefault;
 	use Tests\TestListeners\ActionListener;
@@ -1079,7 +1082,117 @@
 
 
         }
-		
+
+        /** @test */
+		public function if_filtered_value_and_payload_are_the_same_event_objects_get_the_possibility_to_filter_the_return_value () {
+
+		    $this->dispatcher->listen(EventWithDefaults::class, function ( EventWithDefaults $defaults) {
+
+		        return $defaults;
+
+            });
+
+		    $event = new EventWithDefaults();
+
+		    $return = $this->dispatcher->dispatch($event);
+
+		    $this->assertSame('foo', $return);
+
+		    $this->reset();
+
+            $this->dispatcher->listen(EventWithDefaults::class, function ( EventWithDefaults $defaults) {
+
+                return 'bar';
+
+            });
+
+            $event = new EventWithDefaults();
+
+            $return = $this->dispatcher->dispatch($event);
+
+            $this->assertSame('bar', $return);
+
+
+        }
+
+        /** @test */
+		public function the_default_value_can_be_customized_if_the_returned_value_doesnt_match_the_type_hint_on_the_default_method () {
+
+            $this->dispatcher->listen(EventWithDefaults::class, function () {
+
+                return 1;
+
+            });
+            $event = new EventWithDefaults();
+            $return = $this->dispatcher->dispatch($event);
+            $this->assertSame('foo', $return);
+
+            $this->reset();
+
+            $this->dispatcher->listen(EventWithDefaults::class, function () {
+
+                return ['foo'];
+
+            });
+            $event = new EventWithDefaults();
+            $return = $this->dispatcher->dispatch($event);
+            $this->assertSame('foo', $return);
+
+            $this->reset();
+
+            $this->dispatcher->listen(EventWithDefaults::class, function () {
+
+                return 'bar';
+
+            });
+            $event = new EventWithDefaults();
+            $return = $this->dispatcher->dispatch($event);
+            $this->assertSame('bar', $return);
+
+        }
+
+        /** @test */
+		public function the_object_default_value_is_only_respected_if_properly_type_hinted () {
+
+            $this->dispatcher->listen(EventWithDefaultNoTypeHit::class, function () {
+
+                return 1;
+
+            });
+            $event = new EventWithDefaultNoTypeHit();
+            $return = $this->dispatcher->dispatch($event);
+            $this->assertSame(1, $return);
+
+        }
+
+        /** @test */
+		public function the_original_value_and_the_filtered_value_are_passed_to_the_object_for_custom_logic () {
+
+            $this->dispatcher->listen(EventWithDefaultLogic::class, function () {
+
+                return 1;
+
+            });
+            $event = new EventWithDefaultLogic();
+            $return = $this->dispatcher->dispatch($event);
+            $this->assertSame('toString:1', $return);
+
+            $this->reset();
+
+            $this->expectExceptionMessage('Return value is not valid for');
+            $this->dispatcher->listen(EventWithDefaultLogic::class, function () {
+
+                return ['Make it fail'];
+
+            });
+            $event = new EventWithDefaultLogic();
+            $return = $this->dispatcher->dispatch($event);
+
+
+        }
+
+
+
 		private function reset(): void {
 			
 			

@@ -13,6 +13,7 @@
     use BetterWpHooks\Traits\StopsPropagation;
     use BetterWpHooks\WordpressApi;
     use Closure;
+    use Exception;
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
 
@@ -145,72 +146,16 @@
 
         }
 
-        /**
-         *
-         * Creates a AbstractListener if its not a duplicate
-         *
-         * @param         $event
-         * @param         $key
-         * @param  array  $listener
-         *
-         * @return Closure
-         * @throws ReflectionException
-         */
-        private function createListener($event, $key, array $listener) : Closure
-        {
-
-
-            $listener = $this->listener_factory->create($listener);
-
-            if ($this->isDuplicate($event, $listener)) {
-
-                throw new DuplicateListenerException('You cant register two identical callbacks for the same event.');
-
-            }
-
-            $key = $this->createKey($event, $listener, $key);
-
-            return $this->listeners[$event][$key] = $listener;
-
-
-        }
 
         /**
+         * Dispatch an event and call all the listeners.
          *
-         * Create a key and alias for a closure that can later be retrieved
-         *
-         * @param  string  $event
-         * @param  Closure  $listener
-         * @param  string|int  $key
-         *
-         * @return false|string|string[]
-         * @throws ReflectionException
-         */
-        private function createKey(string $event, Closure $listener, $key)
-        {
-
-
-            $aliases = collect(Alias::create($listener, $key));
-            $key = Key::create($listener, $key);
-
-            $aliases->each(function ($alias) use ($event, $key) {
-
-                $this->aliases[$event][$alias] = $key;
-
-            });
-
-            return $key;
-
-        }
-
-        /**
          * @param  string|object  $event
          * @param  array  $payload
          *
          * @return mixed|void
+         * @throws Exception
          * @api
-         *
-         * Dispatch an event and call all the listeners.
          *
          */
         public function dispatch($event, ...$payload)
@@ -228,15 +173,15 @@
 
             if ( ! $this->hasListeners($event)) {
 
-                return $this->determineDefault($payload);
+                return $this->determineDefault($payload, null );
 
             }
 
             $filtered = $this->hook_api->applyFilter($event, $payload);
 
-            if ($filtered === $payload) {
+            if ($filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered)) {
 
-                return $this->determineDefault($payload);
+                return $this->determineDefault($payload, $filtered);
 
             }
 
@@ -245,41 +190,88 @@
 
         }
 
-        private function determineDefault($payload)
+
+        /**
+         *
+         * Remove one listener for a given event from the dispatcher.
+         *
+         * @param  string  $event
+         * @param  string|object  $listener
+         *
+         * @return void
+         * @throws Exception
+         * @api
+         *
+         *
+         */
+        public function forgetOne(string $event, $listener)
         {
 
-            if (is_callable([$payload, 'default'])) {
+            $key = $this->resolveAlias($event, $listener);
 
-                return $payload->default();
+            if ((array_key_exists($key, $this->listeners[$event]))) {
+
+                $closure = $this->listeners[$event][$key];
+
+                $this->isRemovable($closure, $event);
+
+                $this->hook_api->removeFilter($event, $closure);
+
+                unset($this->listeners[$event][$key]);
+                unset($this->aliases[$event] [array_search($key, $this->aliases[$event])]);
+
 
             }
-
-            return is_object($payload) ? $payload : $payload[0];
 
         }
 
         /**
-         * Parse the given event and payload and prepare them for dispatching.
-         * If the event that got dispatched is an object we will use the classname as the event and
-         * object as the payload
          *
-         * @param  mixed  $event
-         * @param  mixed  $payload
+         * Can be chained to the listen function to mark an event as unremovable
          *
-         * @return array
+         * @api
          */
-        private function parseEventAndPayload($event, $payload) : array
+        public function unremovable(string $event, $callable)
         {
 
+            $closure = $this->listen($event, $callable);
 
-            if (is_object($event)) {
+            $this->unremovable[] = spl_object_hash($closure);
 
-                [$payload, $event] = [$event, get_class($event)];
+        }
+
+        /**
+         *
+         * Checks if a registered closure is marked as unremovable
+         * and throws exception if true.
+         *
+         * @param  Closure  $closure
+         * @param  string  $event
+         *
+         * @throws UnremovableListenerException
+         */
+        private function isRemovable(Closure $closure, string $event)
+        {
+
+            if (collect($this->unremovable)->contains($hash = spl_object_hash($closure))) {
+
+                throw new UnremovableListenerException(
+                    'The Hook you tried to remove was marked as unremovable. You tried to remove the Hook: '.$this->findAliasByObjectHash($hash, $event));
 
             }
 
-            return [$event, $payload];
 
+        }
+
+        private function findAliasByObjectHash(string $obj_hash, string $event)
+        {
+
+            return collect($this->aliases[$event])
+                ->filter(function ($key) use ($obj_hash) {
+
+                    return $key === $obj_hash;
+
+                })->keys()->first();
 
         }
 
@@ -291,6 +283,8 @@
          * is readded before the event gets dispatched.
          *
          * @param $event
+         *
+         * @throws Exception
          */
         private function maybeStopPropagation($event) : void
         {
@@ -451,12 +445,75 @@
 
         }
 
+        private function isCorrectReturnValue($payload, $filtered) : bool
+        {
+
+            if ( ! is_callable([$payload, 'default'])) {
+
+                return true;
+
+            }
+
+            $method = new \ReflectionMethod($payload, 'default');
+
+            if ( ! $method->hasReturnType()) {
+
+                return true;
+
+            }
+
+            $expected = $method->getReturnType()->getName();
+
+            return $expected === gettype($filtered);
+
+        }
+
+        private function determineDefault( $payload, $filtered )
+        {
+
+            if (is_callable([$payload, 'default'])) {
+
+                return $payload->default($payload, $filtered);
+
+            }
+
+            return is_object($payload) ? $payload : $payload[0];
+
+        }
+
+        /**
+         * Parse the given event and payload and prepare them for dispatching.
+         * If the event that got dispatched is an object we will use the classname as the event and
+         * object as the payload
+         *
+         * @param  mixed  $event
+         * @param  mixed  $payload
+         *
+         * @return array
+         */
+        private function parseEventAndPayload($event, $payload) : array
+        {
+
+
+            if (is_object($event)) {
+
+                [$payload, $event] = [$event, get_class($event)];
+
+            }
+
+            return [$event, $payload];
+
+
+        }
+
         /**
          *
          * Removes all Listeners for the the event expect the provided one.
          *
          * @param $event
          * @param $expect_listener
+         *
+         * @throws Exception
          */
         private function forgetAllExpect($event, $expect_listener)
         {
@@ -477,85 +534,60 @@
         }
 
         /**
-         * @param  string  $event
-         * @param  string|object  $listener
          *
-         * @return void
-         * @throws \Exception
-         * @api
+         * Creates a AbstractListener if its not a duplicate
          *
-         * Remove one listener for a given event from the dispatcher.
+         * @param         $event
+         * @param         $key
+         * @param  array  $listener
          *
+         * @return Closure
+         * @throws ReflectionException|DuplicateListenerException
          */
-        public function forgetOne(string $event, $listener)
+        private function createListener($event, $key, array $listener) : Closure
         {
 
-            $key = $this->resolveAlias($event, $listener);
 
-            if ((array_key_exists($key, $this->listeners[$event]))) {
+            $listener = $this->listener_factory->create($listener);
 
-                $closure = $this->listeners[$event][$key];
+            if ($this->isDuplicate($event, $listener)) {
 
-                $this->isRemovable($closure, $event);
-
-                $this->hook_api->removeFilter($event, $closure);
-
-                unset($this->listeners[$event][$key]);
-                unset($this->aliases[$event] [array_search($key, $this->aliases[$event])]);
-
+                throw new DuplicateListenerException('You cant register two identical callbacks for the same event.');
 
             }
+
+            $key = $this->createKey($event, $listener, $key);
+
+            return $this->listeners[$event][$key] = $listener;
+
 
         }
 
         /**
          *
-         * Checks if a registered closure is marked as unremovable
-         * and throws exception if true.
+         * Create a key and alias for a closure that can later be retrieved
          *
-         * @param  Closure  $closure
          * @param  string  $event
+         * @param  Closure  $listener
+         * @param  string|int  $key
          *
-         * @throws \BetterWpHooks\Exceptions\UnremovableListenerException
+         * @return string
          */
-        private function isRemovable(Closure $closure, string $event)
+        private function createKey(string $event, Closure $listener, $key) : string
         {
 
-            if (collect($this->unremovable)->contains($hash = spl_object_hash($closure))) {
 
-                throw new UnremovableListenerException(
-                    'The Hook you tried to remove was marked as unremovable. You tried to remove the Hook: '.$this->findAliasByObjectHash($hash, $event));
+            $aliases = collect(Alias::create($listener, $key));
+            $key = Key::create($listener, $key);
 
-            }
+            $aliases->each(function ($alias) use ($event, $key) {
 
+                $this->aliases[$event][$alias] = $key;
 
-        }
+            });
 
-        private function findAliasByObjectHash(string $obj_hash, string $event)
-        {
-
-            return collect($this->aliases[$event])
-                ->filter(function ($key) use ($obj_hash) {
-
-                    return $key === $obj_hash;
-
-                })->keys()->first();
+            return $key;
 
         }
-
-
-        /**
-         * @api
-         * Can be chained to the listen function to mark an event as unremovable
-         */
-        public function unremovable(string $event, $callable)
-        {
-
-            $closure = $this->listen($event, $callable);
-
-            $this->unremovable[] = spl_object_hash($closure);
-
-        }
-
 
     }
