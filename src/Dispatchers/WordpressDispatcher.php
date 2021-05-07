@@ -122,9 +122,8 @@
          *
          * Register an event listener with the dispatcher.
          */
-        public function listen(string $event, $callable) : Closure
+        public function listen(string $event, $callable, int $priority = 10) : Closure
         {
-
 
             $callable = Arr::wrap($callable);
 
@@ -134,10 +133,13 @@
 
             }
 
-            $this->hook_api->addFilter($event, $callable = $this->createListener(
+            $this->hook_api->addFilter(
 
-                $event, array_key_first($callable), $callable
-            )
+                $event,
+                $callable = $this->createListener(
+                    $event, array_key_first($callable), $callable
+                ),
+                $priority
 
             );
 
@@ -173,7 +175,7 @@
 
             if ( ! $this->hasListeners($event)) {
 
-                return $this->determineDefault($payload, null );
+                return $this->determineDefault($payload, null);
 
             }
 
@@ -468,7 +470,7 @@
 
         }
 
-        private function determineDefault( $payload, $filtered )
+        private function determineDefault($payload, $filtered)
         {
 
             if (is_callable([$payload, 'default'])) {

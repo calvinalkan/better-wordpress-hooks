@@ -146,6 +146,7 @@
         public static function tryAsObject(array $arguments, Dispatcher $dispatcher)
         {
 
+
             $class = new \ReflectionClass(static::class);
             $constructor_args = ($constructor = $class->getConstructor()) ? $constructor->getNumberOfParameters() : null;
 
@@ -262,7 +263,7 @@
                     $wp_api = new WordpressApi()
                 ),
 
-                new WordpressEventMapper($wp_api)
+                new WordpressEventMapper($container_adapter ,$wp_api)
 
             );
 
