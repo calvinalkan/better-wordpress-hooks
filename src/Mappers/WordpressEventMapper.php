@@ -26,7 +26,9 @@
          */
         private $container;
 
-        /** @var Dispatcher */
+        /**
+         * @var Dispatcher
+         */
         private $dispatcher;
 
         public function __construct( ContainerAdapter $container, Dispatcher $dispatcher, WordpressApi $wp_api = null ) {

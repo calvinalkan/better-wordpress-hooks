@@ -271,23 +271,21 @@ AcmeEvents::make($custom_container_adapter);
 **3. Map core and 3rd party hooks to custom event objects ( optional but recommended )**.
 
 All that this does is dispatching your custom event object when the WP Hooks is fired. We'll see why we do this in a
-minute.
+minute. By default, mapped events are not resolved from the service container as they should only be data classes. 
+However, if you pass `'resolve'` as the first key your mapped event will be resolved from the container and dispatched afterwards. 
 
 ```php
 $mapped = [
 
-'init' => [
+// Will fire on priority 10
+'init' =>  RegisterJobListingPostType::class,
 
-    RegisterJobListingPostType::class,
-    
-    // more events
-], 
+// Will fire on priority 99
+'save_post_job_listing' => [JobListingCreated::class, 99],
 
-'save_post_job_listing' => [
-
-    JobListingCreated::class
-    
-]
+// Will be resolved from the service container
+// and fire on priority 99.
+'booking_created' => ['resolve' ,BookingCreated::class, 99],
 
 ];
 
@@ -697,6 +695,43 @@ Default return values are evaluated in the following order:
 2. If there is no ````default()```` method on the event class, but you are dispatching an event object, the object itself will be returned. For the example above the instance of ``AppointmentCreated`` would be returned.
 
 3. If #1 and #2 are not possible the first parameter passed into the ````dispatch()```` method will be returned.
+
+#### Return values for invalid callback
+
+A common pain point when offering filters is that users don't respect the API of your filter and return incompatible values. 
+If you are using object events you can typehint the expected return value on the `default()` method. 
+If the value returned from a filter is either:
+1. The same as the original payload or
+2. NOT of the same type as the typehint on `default()` the filtered value will be discarded, and your event`s default method will be called with both the payload, and the filtered value, giving you the option to fix things. 
+
+**Example**
+````php
+class MyEvent extends AcmeEvents {
+
+    public function default($original_payload, $filtered_value) :array {
+    
+          return [$filtered_value];  
+            
+    }
+
+}
+````
+Assuming a third party developer would hook into your filter like this:
+```php
+add_filter(MyEvent::class, function ( $event ) {
+    return 'foo';
+});
+```
+
+```php
+$value = MyEvent::dispatch();
+
+// without array typehint $value = 'foo', whoops.
+$do_stuff = $value[0];
+
+// with typehint on default()
+// $value = ['foo'];
+```
 
 ***
 
