@@ -39,7 +39,7 @@
 			
 		}
 		
-		public function addFilter( $event, $listener, $priority = 10, $args = 1 ) {
+		public function addFilter( $event, $listener, $priority = 10, $args = 99 ) {
 			
 			add_filter( $event, $listener, $priority, $args );
 			

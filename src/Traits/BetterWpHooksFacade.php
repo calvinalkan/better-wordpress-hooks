@@ -257,13 +257,13 @@
 
                 $container_adapter,
 
-                new WordpressDispatcher(
+                $dispatcher = new WordpressDispatcher(
 
                     new ListenerFactory($container_adapter),
                     $wp_api = new WordpressApi()
                 ),
 
-                new WordpressEventMapper($container_adapter ,$wp_api)
+                new WordpressEventMapper($container_adapter ,$dispatcher, $wp_api)
 
             );
 

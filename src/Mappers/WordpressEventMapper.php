@@ -6,6 +6,7 @@
     use BetterWpHooks\Contracts\EventMapper;
     use BetterWpHooks\Traits\ReflectsCallable;
     use BetterWpHooks\WordpressApi;
+    use Closure;
     use Contracts\ContainerAdapter;
     use Illuminate\Support\Arr;
 
@@ -29,10 +30,11 @@
         /** @var Dispatcher */
         private $dispatcher;
 
-        public function __construct( ContainerAdapter $container, WordpressApi $wp_api = null ) {
+        public function __construct( ContainerAdapter $container, Dispatcher $dispatcher, WordpressApi $wp_api = null ) {
 			
 			$this->wp_api = $wp_api ?? new WordpressApi();
             $this->container = $container;
+            $this->dispatcher = $dispatcher;
         }
 		
 		
@@ -44,44 +46,62 @@
 		 */
 		public function listen( string $hook_name, $event, int $priority = 10 ) {
 
-		    $event = $this->normalize($event);
+            $event = $this->normalize($event);
+
+		    if ( $resolve_from_container = $event[0] === self::resolve_key ) {
+
+		        array_shift($event);
+
+            }
+
 
 			$priority = $event[1] ?? $priority;
 			
-			$hook = $this->makeHook( $hook_name, $event[0] , $priority );
+			$callable = $this->makeCallable( $event[0] , $resolve_from_container );
 
-			$this->wp_api->addFilter(...$hook);
+			$this->wp_api->addFilter($hook_name, $callable, $priority);
 			
 			
 		}
-		
-		
-		private function makeHook( $hook_name, $event, $priority ): array {
 
-		    $callable = is_callable($event) ? $event : [ $event, 'mapEvent'];
+        /**
+         * @param  string  $event
+         * @param  bool  $from_container
+         *
+         * @return Closure|array|
+         */
+		private function makeCallable( string $event, bool $from_container = false  ) {
 
-			return [  $hook_name, $callable , $priority, 99   ];
+		    if ( ! $from_container ) {
+
+		        return [ $event, 'mapEvent'];
+
+            }
+
+		    return $this->buildResolvableForMappedEvent($event);
+
 			
 		}
 
-        private function buildResolvableForMappedEvent(string $hook_name, array $mapped_event)
+        private function buildResolvableForMappedEvent(string $event) : Closure
         {
 
+            return function (...$args_from_wp) use ($event) {
 
-            $resolvable = function (...$args_from_wp) use ($class) {
+                $payload = $this->buildNamedConstructorArgs($event, $args_from_wp);
 
-                $payload = $this->buildNamedConstructorArgs($class, $args_from_wp);
+                $event_object = $this->container->make($event, $payload);
 
-                $event_object = $this->container->make($class, $payload);
-
-                return $this->dispatcher()->dispatch($event_object);
+                return $this->dispatcher->dispatch($event_object);
 
             };
 
 
+
         }
 
-        private function normalize ( $mapped_event ) {
+        private function normalize ( $mapped_event ) : array
+        {
 
             $mapped_event = Arr::wrap($mapped_event);
 

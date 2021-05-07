@@ -326,6 +326,7 @@
                 'init' => [
 
                     ActionListener::class,
+
                 ],
 
                 'admin_init' => [
