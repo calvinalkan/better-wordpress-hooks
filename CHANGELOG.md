@@ -5,7 +5,7 @@
 ### Added
 
 - Added release notes. 
-- Added new documentation for Release [0.1.4](#014httpsgithubcomcalvinalkanbetter-wordpress-hookscompare013014)
+- Added new documentation for Release [0.1.4](https://github.com/calvinalkan/better-wordpress-hooks/blob/master/CHANGELOG.md#014)
 
 ## [0.1.4](https://github.com/calvinalkan/better-wordpress-hooks/compare/0.1.3...0.1.4)
 
