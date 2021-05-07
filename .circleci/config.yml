@@ -18,8 +18,6 @@ jobs:
       - run: sudo docker-php-ext-install zip
       # Clear composer cache
       - run: composer clearcache
-      # Self-update composer
-      - run: composer self-update
       # Run composer install
       - run: composer install --no-interaction
       # TEST
