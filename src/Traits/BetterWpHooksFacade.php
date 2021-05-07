@@ -4,6 +4,7 @@
     namespace BetterWpHooks\Traits;
 
     use BetterWpHooks\BetterWpHooks;
+    use BetterWpHooks\Contracts\Dispatcher;
     use BetterWpHooks\Dispatchers\WordpressDispatcher;
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\ListenerFactory;
@@ -11,6 +12,7 @@
     use BetterWpHooks\Testing\FakeDispatcher;
     use BetterWpHooks\WordpressApi;
     use Contracts\ContainerAdapter;
+    use Illuminate\Support\Arr;
     use SniccoAdapter\BaseContainerAdapter;
 
     use function BetterWpHooks\Functions\hasTrait;
@@ -24,24 +26,24 @@
     trait BetterWpHooksFacade
     {
 
+        use ReflectsCallable;
 
         /**
          * @var null|BetterWpHooks
          */
-        public static $instance = NULL;
+        public static $instance = null;
 
-        public static function make ( ContainerAdapter $container_adapter = NULL ) : ?BetterWpHooks
+        public static function make(ContainerAdapter $container_adapter = null) : ?BetterWpHooks
         {
 
 
-            static::setInstance( $instance = static::createInstance( $container_adapter ) );
+            static::setInstance($instance = static::createInstance($container_adapter));
 
             return $instance;
 
         }
 
-
-        public static function getInstance () : ?BetterWpHooks
+        public static function getInstance() : ?BetterWpHooks
         {
 
             return static::$instance;
@@ -49,14 +51,12 @@
 
         }
 
-
-        public static function setInstance ( ?BetterWpHooks $better_wp_hooks )
+        public static function setInstance(?BetterWpHooks $better_wp_hooks)
         {
 
             static::$instance = $better_wp_hooks;
 
         }
-
 
         /**
          * Invoke any matching instance method for the static method being called.
@@ -65,29 +65,29 @@
          * @param  array  $parameters
          *
          * @return mixed
-         * @throws \BetterWpHooks\Exceptions\ConfigurationException
+         * @throws ConfigurationException
          */
-        public static function __callStatic ( string $method, array $parameters )
+        public static function __callStatic(string $method, array $parameters)
         {
 
             self::checkConfiguration();
 
             $instance = self::getInstance();
 
-            $callable = [ $instance, $method ];
+            $callable = [$instance, $method];
 
-            if ( ! is_callable( $callable ) ) {
+            if ( ! is_callable($callable)) {
 
-                $callable = [ $instance->dispatcher(), $method ];
+                $callable = [$instance->dispatcher(), $method];
 
-                if ( is_callable( $callable ) ) {
+                if (is_callable($callable)) {
 
-                    return call_user_func_array( $callable, $parameters );
+                    return call_user_func_array($callable, $parameters);
 
 
                 }
 
-                if ( self::isTestAssertion( $method ) ) {
+                if (self::isTestAssertion($method)) {
 
                     throw new ConfigurationException(
                         'Did you forget to set up the FakeDispatcher with {YourFacadeClass}::fake()?'
@@ -96,62 +96,86 @@
                 }
 
                 throw new \BadMethodCallException(
-                    'Method ' . get_class( $instance ) . '::' . $method . '() does not exist.'
+                    'Method '.get_class($instance).'::'.$method.'() does not exist.'
                 );
 
             }
 
-            return call_user_func_array( $callable, $parameters );
+            return call_user_func_array($callable, $parameters);
 
 
         }
 
-
         /**
-         * Dispatch the event with the given arguments.
-         *
-         * @param         $event_blueprint
-         * @param  mixed  ...$payload
-         *
-         * @return mixed
-         * @throws \BetterWpHooks\Exceptions\ConfigurationException
+         * @throws ConfigurationException
          */
-        public static function dispatch ( $event_blueprint, ...$payload )
+        public static function dispatch()
         {
 
             self::checkConfiguration();
 
+            $arguments = func_get_args();
+
             $dispatcher = self::$instance->dispatcher();
 
-            if ( is_object( $event_blueprint ) ) {
+            if (self::isEventObject(static::class)) {
 
-                return $dispatcher->dispatch( $event_blueprint );
+                return static::tryAsObject($arguments, $dispatcher);
+
+            }
+
+            if ( is_array($arguments[0])) {
+
+                throw new ConfigurationException(
+                    'You are trying to dispatch an event with the facade but the first argument is not a string.'
+                );
 
             }
 
-            if ( is_array( $event_blueprint ) ) {
-
-                $event_object = new static( ...$event_blueprint );
-
-                return $dispatcher->dispatch( $event_object );
-
-            }
 
             return $dispatcher->dispatch(
-                $event_blueprint, self::unwrapIfMultidimensional( $payload )
+
+                array_shift($arguments),
+                self::unwrapIfMultidimensional($arguments)
+
             );
 
 
         }
 
-
-        public static function mapEvent ( ...$args_from_wp )
+        public static function tryAsObject(array $arguments, Dispatcher $dispatcher)
         {
 
-            return self::dispatch( new static( ...$args_from_wp ) );
+            $class = new \ReflectionClass(static::class);
+            $constructor_args = ($constructor = $class->getConstructor()) ? $constructor->getNumberOfParameters() : null;
+
+            if ( ! $constructor_args) {
+
+                return $dispatcher->dispatch($class->newInstanceArgs());
+
+            }
+
+            if ( is_object($arguments[0]) ) {
+
+                return $dispatcher->dispatch($arguments[0]);
+            }
+
+            if (is_array($arguments[0])) {
+
+                return $dispatcher->dispatch($class->newInstanceArgs($arguments[0]));
+
+            }
+
+            throw new ConfigurationException('event is not instantiable as object');
 
         }
 
+        public static function mapEvent(...$args_from_wp)
+        {
+
+            return self::dispatch(new static(...$args_from_wp));
+
+        }
 
         /**
          * Accepts a boolean as the first parameter and only
@@ -162,16 +186,16 @@
          *
          * @return mixed
          */
-        public static function dispatchIf ( bool $condition, ...$args )
+        public static function dispatchIf(bool $condition, ...$args)
         {
 
-            if ( $condition === TRUE ) {
+            if ($condition === true) {
 
-                $args = self::unwrapIfMultidimensional( $args );
+                $args = self::unwrapIfMultidimensional($args);
 
-                $event_object = new static( ...$args );
+                $event_object = new static(...$args);
 
-                if ( ! self::isEventObject( $event_object ) ) {
+                if ( ! self::isEventObject($event_object)) {
 
                     throw new \BadMethodCallException(
                         'Doing it wrong: The Plugin facade is not meant to be used for conditional dispatching. You should use event objects instead'
@@ -179,13 +203,12 @@
 
                 }
 
-                return self::dispatch( $event_object );
+                return static::dispatcher()->dispatch($event_object);
 
             }
 
 
         }
-
 
         /**
          * Accepts a boolean or a closure as the first parameter and only
@@ -196,11 +219,11 @@
          *
          * @return mixed
          */
-        public static function dispatchUnless ( bool $condition, ...$args )
+        public static function dispatchUnless(bool $condition, ...$args)
         {
 
 
-            return self::dispatchIf( ! $condition, self::unwrapIfMultidimensional( $args ) );
+            return self::dispatchIf( ! $condition, self::unwrapIfMultidimensional($args));
 
 
         }
@@ -212,20 +235,19 @@
          *
          * @return FakeDispatcher
          */
-        public static function fake ( $eventsToFake = [] ) : FakeDispatcher
+        public static function fake($eventsToFake = []) : FakeDispatcher
         {
 
-            $event_fake = new FakeDispatcher( self::$instance->dispatcher(), $eventsToFake );
+            $event_fake = new FakeDispatcher(self::$instance->dispatcher(), $eventsToFake);
 
-            self::$instance->swapDispatcher( $event_fake );
+            self::$instance->swapDispatcher($event_fake);
 
             return $event_fake;
 
 
         }
 
-
-        private static function createInstance ( ContainerAdapter $container_adapter = NULL ) : BetterWpHooks
+        private static function createInstance(ContainerAdapter $container_adapter = null) : BetterWpHooks
         {
 
             $container_adapter = $container_adapter ?? new BaseContainerAdapter();
@@ -236,33 +258,32 @@
 
                 new WordpressDispatcher(
 
-                    new ListenerFactory( $container_adapter ),
+                    new ListenerFactory($container_adapter),
                     $wp_api = new WordpressApi()
                 ),
 
-                new WordpressEventMapper( $wp_api )
+                new WordpressEventMapper($wp_api)
 
             );
 
 
         }
 
-        private static function checkConfiguration ()
+        private static function checkConfiguration()
         {
 
-            if ( ! self::getInstance() ) {
+            if ( ! self::getInstance()) {
 
                 throw new ConfigurationException(
-                    'BetterWpHooks instance not created in ' . static::class . '. ' .
-                    'Did you miss to call ' . static::class . '::make()?'
+                    'BetterWpHooks instance not created in '.static::class.'. '.
+                    'Did you miss to call '.static::class.'::make()?'
                 );
 
             }
 
         }
 
-
-        private static function isTestAssertion ( string $method ) : bool
+        private static function isTestAssertion(string $method) : bool
         {
 
 
@@ -275,28 +296,20 @@
 
             ];
 
-            return in_array($method, $methods );
+            return in_array($method, $methods);
 
         }
 
-
-        /**
-         * @param  array  $array
-         *
-         * @return array
-         */
-        private static function unwrapIfMultidimensional ( array $array ) : array
+        private static function unwrapIfMultidimensional(array $array) : array
         {
 
-            $array = ( ! empty( $array ) && is_array( $array[0] )) ? $array[0] : $array;
-
-            return $array;
+            return ( ! empty($array) && is_array($array[0])) ? $array[0] : $array;
         }
 
-        private static function isEventObject ( $event_object ) : bool
+        private static function isEventObject($event_object) : bool
         {
 
-            return ! hasTrait( BetterWpHooksFacade::class, $event_object );
+            return ! hasTrait(BetterWpHooksFacade::class, $event_object);
 
         }
 

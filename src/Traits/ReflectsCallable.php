@@ -3,14 +3,18 @@
 	namespace BetterWpHooks\Traits;
 	
 	use Illuminate\Support\Str;
-	use ReflectionMethod;
+    use ReflectionException;
+    use ReflectionMethod;
 	
 	use function BetterWpHooks\Functions\classExists;
 	use function BetterWpHooks\Functions\isClosure;
 	
 	trait ReflectsCallable {
-		
-		private function getCallReflector( $callback , $default_method) {
+
+        /**
+         * @throws ReflectionException
+         */
+        private function getCallReflector( $callback , $default_method) {
 			
 			if ( isClosure($callback ) ) return new \ReflectionFunction($callback);
 			
@@ -21,11 +25,12 @@
 			return new ReflectionMethod( $class , $method );
 			
 		}
-		
 
-		
-		
-		private function buildParameterNames( $class_callable, $payload ) :array {
+
+        /**
+         * @throws ReflectionException
+         */
+        private function buildParameterNames( $class_callable, $payload ) :array {
 			
 			$payload =  ( ! is_array($payload ) ) ? [ $payload ] : $payload;
 			

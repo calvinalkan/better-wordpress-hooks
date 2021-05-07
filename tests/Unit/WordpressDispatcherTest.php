@@ -17,7 +17,8 @@
 	use Tests\TestDependencies\ComplexListener;
 	use Tests\TestDependencies\ComplexMethodDependency;
 	use Tests\TestEvents\ConditionalEvent;
-	use Tests\TestEvents\FilterableWithoutDefault;
+    use Tests\TestEvents\EventWithoutParameters;
+    use Tests\TestEvents\FilterableWithoutDefault;
 	use Tests\TestListeners\ActionListener;
 	use Exception;
 	use Tests\TestListeners\ConditionalListener;
@@ -187,8 +188,12 @@
 			
 			
 		}
-		
-		
+
+
+
+
+
+
 		/**
 		 *
 		 *

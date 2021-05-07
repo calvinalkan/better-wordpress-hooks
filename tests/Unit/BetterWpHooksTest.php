@@ -11,7 +11,7 @@
 	use PHPUnit\Framework\TestCase;
 	use SniccoAdapter\BaseContainerAdapter;
 	use Tests\Exceptions\DidAction;
-	use Tests\TestListeners\ActionListener;
+    use Tests\TestListeners\ActionListener;
 	use Tests\TestEvents\FilterableEvent;
 	use Tests\TestStubs\DifferentContainer;
 	use Tests\TestStubs\Plugin1;
@@ -795,8 +795,24 @@
 			
 			
 		}
-		
-		
+
+        /** @test */
+        public function object_events_can_be_dispatched_without_passing_parameters () {
+
+            $this->newPlugin1();
+
+            Plugin1::listen(EventNoParams::class, function ($event) {
+
+                return $event->payload();
+
+            });
+
+            $this->assertSame('foobar', EventNoParams::dispatch());
+
+
+        }
+
+
 		/**
 		 *
 		 *
@@ -1260,7 +1276,20 @@
 		
 		
 	}
-	
+
+	class EventNoParams extends Plugin1 {
+
+		public  $foobar = 'foobar';
+
+		public function payload() {
+
+		    return $this->foobar;
+
+        }
+
+
+	}
+
 	class Filterable extends Plugin1 {
 		
 		
