@@ -16,7 +16,6 @@
 
         const resolve_key = 'resolve';
 
-
         /**
 		 * @var WordpressApi
 		 */
