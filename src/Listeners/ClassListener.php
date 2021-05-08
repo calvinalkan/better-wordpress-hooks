@@ -3,32 +3,29 @@
 	namespace BetterWpHooks\Listeners;
 	
 	use BetterWpHooks\Contracts\AbstractListener;
-	use BetterWpHooks\Traits\ReflectsCallable;
 	use Contracts\ContainerAdapter;
 
-    use Illuminate\Support\Str;
-
     use function BetterWpHooks\Functions\normalizeClassMethod;
-	
+
+
 	class ClassListener extends AbstractListener {
 		
-		use ReflectsCallable;
-		
+
 		/**
 		 * @var array
 		 */
 		private $class_callable;
-		
+
 		/**
 		 * @var \Contracts\ContainerAdapter
 		 */
-		private $container;
-		
+		protected $container;
+
 		public function __construct( array $listener, ContainerAdapter $container ) {
-			
+
 			$this->class_callable = $this->toArrayCallable( $listener );
 			$this->container      = $container;
-			
+
 		}
 		
 		
@@ -66,28 +63,5 @@
 			
 		}
 
-		private function callClassMethod( array $class_callable, $payload ) {
-			
-			$parameters = $this->buildParameterNames( $class_callable, $payload );
-			
-			return $this->container->call( normalizeClassMethod( $class_callable, 'handleEvent' ), $parameters );
-			
-			
-		}
 
-		private function toArrayCallable(array $listener) : array
-        {
-
-		    $listener = array_values($listener);
-
-		    if (Str::contains($listener[0],'@')) {
-
-		        $listener = Str::parseCallback($listener[0]);
-
-            }
-
-		    return $listener;
-
-        }
-		
-	}
+    }

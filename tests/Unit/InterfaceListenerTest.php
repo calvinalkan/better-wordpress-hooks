@@ -28,22 +28,7 @@
          */
         private $container;
 
-        /** @test */
-        public function a_listener_can_be_an_interface_if_bound_in_the_container () {
 
-            $this->container->singleton(ListenerInterface::class, function () {
-
-                return new InterfaceImplementation();
-
-            });
-
-            $this->dispatcher->listen('event1', ListenerInterface::class . '@handle');
-
-            $value = $this->dispatcher->dispatch('event1', 'foo');
-
-            $this->assertSame('foo', $value);
-
-        }
 
         protected function setUp(): void {
 
@@ -77,6 +62,26 @@
             $this->reset();
 
         }
+
+
+        /** @test */
+        public function a_listener_can_be_an_interface_if_bound_in_the_container () {
+
+            $this->container->singleton(ListenerInterface::class, function () {
+
+                return new InterfaceImplementation();
+
+            });
+
+            $this->dispatcher->listen('event1', ListenerInterface::class . '@handleEvent');
+
+            $value = $this->dispatcher->dispatch('event1', 'foo');
+
+            $this->assertSame('foo', $value);
+
+        }
+
+
 
         private function reset(): void {
 
