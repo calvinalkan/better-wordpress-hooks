@@ -61,12 +61,6 @@
         {
 
 
-            if ($this->isInterfaceListener($listener)) {
-
-                return $this->wrap(new InterfaceListener($listener, $this->container));
-
-            }
-
             if (isInitializedClass(arrayFirst($listener))) {
 
                 return $this->wrap(new InstanceListener($listener, $this->container));
@@ -82,6 +76,12 @@
             if ($this->isClassListener($listener)) {
 
                 return $this->wrap(new ClassListener($listener, $this->container));
+
+            }
+
+            if ($this->isInterfaceListener($listener)) {
+
+                return $this->wrap(new InterfaceListener($listener, $this->container));
 
             }
 
@@ -148,9 +148,7 @@
 
             if ( ! interface_exists($callable[0]) || ! $this->container->offsetExists($callable[0])) {
 
-                throw new InvalidListenerException(
-                    'Invalid interface listener ['.implode(', ', Arr::flatten($callable)).'] provided.'
-                );
+               return false;
 
             }
 
