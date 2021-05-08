@@ -20,7 +20,6 @@
     use Tests\TestEvents\EventWithDefaultLogic;
     use Tests\TestEvents\EventWithDefaultNoTypeHit;
     use Tests\TestEvents\EventWithDefaults;
-    use Tests\TestEvents\EventWithoutParameters;
     use Tests\TestEvents\FilterableWithoutDefault;
 	use Tests\TestListeners\ActionListener;
 	use Exception;

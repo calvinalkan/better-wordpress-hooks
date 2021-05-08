@@ -15,6 +15,7 @@
     use Tests\TestDependencies\SimpleClass;
     use Tests\TestListeners\ActionListener;
     use Tests\TestEvents\FilterableEvent;
+    use Tests\TestListeners\ListenerInterface;
     use Tests\TestStubs\DifferentContainer;
     use Tests\TestStubs\Plugin1;
     use Tests\TestStubs\Plugin2;
@@ -408,6 +409,9 @@
             $this->assertSame('simple class. ', apply_filters('init', 'null'));
 
         }
+
+
+
 
         /**
          *

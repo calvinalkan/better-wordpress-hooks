@@ -89,7 +89,13 @@
 
             return function (...$args_from_wp) use ($event) {
 
-                $payload = $this->buildNamedConstructorArgs($event, $args_from_wp);
+                $args = collect($args_from_wp)->reject(function ( $arg )  {
+
+                    return empty($arg);
+
+                });
+
+                $payload = $this->buildNamedConstructorArgs($event, $args->all());
 
                 $event_object = $this->container->make($event, $payload);
 
