@@ -1,5 +1,9 @@
 # Release Notes
 
+## [0.1.6](https://github.com/calvinalkan/better-wordpress-hooks/compare/0.1.5...0.1.6)
+
+- Update dependency on calvinalkan/interfaces to 0.1.2. The `ContainerAdapter` Interface now required a method `implementation()` to get the underlying container implementation of the adapter.
+
 ## [0.1.5](https://github.com/calvinalkan/better-wordpress-hooks/compare/0.1.4...0.1.5)
 
 ### Added
