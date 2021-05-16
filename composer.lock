@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d6a7fe519d9f19cc113397b9d34dc804",
+    "content-hash": "009d63fa6fbb8b3de66b42bd58402174",
     "packages": [
         {
             "name": "calvinalkan/base-container",
-            "version": "0.1.3",
+            "version": "0.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/calvinalkan/base-container.git",
-                "reference": "97f2732d9fd59dda499c9671265a98a8f2055f46"
+                "reference": "ff528e70a07f2f9ea1f6258e469cbd01d48a8c3a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/calvinalkan/base-container/zipball/97f2732d9fd59dda499c9671265a98a8f2055f46",
-                "reference": "97f2732d9fd59dda499c9671265a98a8f2055f46",
+                "url": "https://api.github.com/repos/calvinalkan/base-container/zipball/ff528e70a07f2f9ea1f6258e469cbd01d48a8c3a",
+                "reference": "ff528e70a07f2f9ea1f6258e469cbd01d48a8c3a",
                 "shasum": ""
             },
             "require": {
-                "calvinalkan/interfaces": "0.1.1",
+                "calvinalkan/interfaces": "0.1.2",
                 "illuminate/container": "8.35.1",
                 "php": "^7.3"
             },
@@ -45,22 +45,22 @@
             "homepage": "https://github.com/calvinalkan/base-container/",
             "support": {
                 "issues": "https://github.com/calvinalkan/base-container/issues",
-                "source": "https://github.com/calvinalkan/base-container/tree/0.1.3"
+                "source": "https://github.com/calvinalkan/base-container/tree/0.1.5"
             },
-            "time": "2021-04-21T00:14:26+00:00"
+            "time": "2021-05-16T22:13:54+00:00"
         },
         {
             "name": "calvinalkan/interfaces",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/calvinalkan/interfaces.git",
-                "reference": "73a20799a1d14e633e6a622a2803cf43afd66da3"
+                "reference": "0fea90f9b44aba562a865c8d2618d8a3cc456d4d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/calvinalkan/interfaces/zipball/73a20799a1d14e633e6a622a2803cf43afd66da3",
-                "reference": "73a20799a1d14e633e6a622a2803cf43afd66da3",
+                "url": "https://api.github.com/repos/calvinalkan/interfaces/zipball/0fea90f9b44aba562a865c8d2618d8a3cc456d4d",
+                "reference": "0fea90f9b44aba562a865c8d2618d8a3cc456d4d",
                 "shasum": ""
             },
             "type": "library",
@@ -89,9 +89,9 @@
             ],
             "support": {
                 "issues": "https://github.com/calvinalkan/interfaces/issues",
-                "source": "https://github.com/calvinalkan/interfaces/tree/0.1.1"
+                "source": "https://github.com/calvinalkan/interfaces/tree/0.1.2"
             },
-            "time": "2021-04-17T00:56:00+00:00"
+            "time": "2021-05-16T22:09:45+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -295,16 +295,16 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v8.38.0",
+            "version": "v8.41.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "5764f703ea8f74ced163125d810951cd5ef2b7e1"
+                "reference": "64abbe2aeee0855a11cfce49d0ea08a0aa967cd2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/5764f703ea8f74ced163125d810951cd5ef2b7e1",
-                "reference": "5764f703ea8f74ced163125d810951cd5ef2b7e1",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/64abbe2aeee0855a11cfce49d0ea08a0aa967cd2",
+                "reference": "64abbe2aeee0855a11cfce49d0ea08a0aa967cd2",
                 "shasum": ""
             },
             "require": {
@@ -339,7 +339,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-04-01T13:09:31+00:00"
+            "time": "2021-05-06T14:58:48+00:00"
         },
         {
             "name": "illuminate/macroable",

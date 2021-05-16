@@ -90,4 +90,9 @@
             // TODO: Implement singleton() method.
         }
 
+        public function implementation()
+        {
+            // TODO: Implement implementation() method.
+        }
+
     }
