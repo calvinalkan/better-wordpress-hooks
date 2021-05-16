@@ -1,6 +1,15 @@
 # Release Notes
 
+## [0.1.7](https://github.com/calvinalkan/better-wordpress-hooks/compare/0.1.6...0.1.7)
+
+### Added
+
+- Added better-wordpress-hook-api-clone to dependencies instead of dev-dependencies.
+- Added an optional parameter to pass a custom file path into the `setUpWp()` method when using the testing module
+
 ## [0.1.6](https://github.com/calvinalkan/better-wordpress-hooks/compare/0.1.5...0.1.6)
+
+### Added
 
 - Update dependency on calvinalkan/interfaces to 0.1.2. The `ContainerAdapter` Interface now required a method `implementation()` to get the underlying container implementation of the adapter.
 

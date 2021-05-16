@@ -13,13 +13,13 @@
   "require": {
     "php": "^7.3",
     "illuminate/support": "8.35.1",
-    "calvinalkan/base-container": "0.1.5"
+    "calvinalkan/base-container": "0.1.5",
+    "calvinalkan/wordpress-hook-api-clone": "5.7.2"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",
     "mockery/mockery": "^1.4.2",
     "codeception/assert-throws": "dev-master",
-    "calvinalkan/wordpress-hook-api-clone": "dev-master",
     "php-coveralls/php-coveralls": "^2.4"
   },
     "license": "GPL-2.0-or-later",
