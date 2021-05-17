@@ -860,7 +860,7 @@
 
             Plugin1::listen(EventNoParams::class, function ($event) {
 
-                return $event->payload();
+                return $event->test();
 
             });
 
@@ -1425,7 +1425,7 @@
 
         public $foobar = 'foobar';
 
-        public function payload()
+        public function test()
         {
 
             return $this->foobar;

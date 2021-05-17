@@ -1,5 +1,19 @@
 # Release Notes
 
+## [0.1.8](https://github.com/calvinalkan/better-wordpress-hooks/compare/0.1.7...0.1.8)
+
+### Added 
+
+- Support for custom event payloads. Object events can now define a `payload()` method which is used then instead of the object itself when dispatching the event. Fixes [issue #9.](https://github.com/calvinalkan/better-wordpress-hooks/issues/9) 
+
+### Updated
+
+- You now need to pass the vendor directory into the `setUpWp()` method when using the BetterWpHooksTestCase.
+
+### Fixed
+
+- BetterWpHooksTestCase looked for the bootstrap file in the wrong directory. 
+
 ## [0.1.7](https://github.com/calvinalkan/better-wordpress-hooks/compare/0.1.6...0.1.7)
 
 ### Added

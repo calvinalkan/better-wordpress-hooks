@@ -16,6 +16,11 @@ class BetterWpHooksTestCaseTest extends TestCase
 
     private $test_case;
 
+    /**
+     * @var string
+     */
+    private $vendor_dir;
+
 
     protected function setUp(): void
     {
@@ -24,6 +29,10 @@ class BetterWpHooksTestCaseTest extends TestCase
 
         $this->test_case = new BetterWpHooksTestCase();
 
+        $ds = DIRECTORY_SEPARATOR;
+
+        $this->vendor_dir = rtrim(getenv('ROOT_DIR', $ds)) . $ds . 'vendor';
+
     }
 
 
@@ -31,7 +40,7 @@ class BetterWpHooksTestCaseTest extends TestCase
     public function the_class_wp_hook_exists_when_loaded_the_test_case()
     {
 
-        $this->test_case->setUpWp();
+        $this->test_case->setUpWp($this->vendor_dir);
 
         self::assertTrue(class_exists(\WP_Hook::class), 'The class WP_Hook was not loaded');
 
@@ -44,7 +53,7 @@ class BetterWpHooksTestCaseTest extends TestCase
 
         try {
 
-            $this->test_case->setUpWp();
+            $this->test_case->setUpWp($this->vendor_dir);
 
             Assert::assertTrue(true, 'Exception handled');
 
@@ -67,7 +76,7 @@ class BetterWpHooksTestCaseTest extends TestCase
         $GLOBALS['wp_filter']['init'][10] = [['function' => function () {
         }, 'accepted_args' => 1,]];
 
-        $this->test_case->setUpWp();
+        $this->test_case->setUpWp($this->vendor_dir);
 
         $this->assertEmpty($GLOBALS['wp_filter']);
         $this->assertEmpty($GLOBALS['wp_actions']);
@@ -80,7 +89,7 @@ class BetterWpHooksTestCaseTest extends TestCase
     public function assert_that_globals_are_emptied_out_in_tear_down()
     {
 
-        $this->test_case->setUpWp();
+        $this->test_case->setUpWp($this->vendor_dir);
 
         add_action('foo', function () {
             return 'foo';

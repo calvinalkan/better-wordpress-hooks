@@ -7,10 +7,11 @@
 	class BetterWpHooksTestCase extends TestCase {
 	
 		
-		public function setUpWp(string $custom_file = null) {
+		public function setUpWp( string $vendor_dir ) {
 
+            $ds = DIRECTORY_SEPARATOR;
 
-            $plugin_php = $custom_file ?? dirname( __DIR__, 2 ) . '/vendor/calvinalkan/wordpress-hook-api-clone/plugin.php';
+            $plugin_php = rtrim($vendor_dir, $ds) . $ds . 'calvinalkan' . $ds . 'wordpress-hook-api-clone' . $ds . 'plugin.php';
 
 			if ( ! file_exists( $plugin_php ) ) {
 

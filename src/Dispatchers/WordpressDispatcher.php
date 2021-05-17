@@ -499,7 +499,9 @@
 
             if (is_object($event)) {
 
-                [$payload, $event] = [$event, get_class($event)];
+                $payload = method_exists($event, 'payload') ? $event->payload() : $event;
+
+                [$payload, $event] = [$payload, get_class($event)];
 
             }
 
