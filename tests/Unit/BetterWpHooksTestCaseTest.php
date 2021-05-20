@@ -31,7 +31,7 @@ class BetterWpHooksTestCaseTest extends TestCase
 
         $ds = DIRECTORY_SEPARATOR;
 
-        $this->vendor_dir = rtrim(getenv('ROOT_DIR', $ds)) . $ds . 'vendor';
+        $this->vendor_dir = ROOT_DIR . $ds . 'vendor';
 
     }
 

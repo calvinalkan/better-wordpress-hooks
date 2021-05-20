@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         bootstrap="tests/bootstrap.php"
          cacheResultFile=".phpunit.cache/test-results"
          executionOrder="depends,defects"
          forceCoversAnnotation="false"
@@ -16,9 +16,8 @@
             <directory>tests/Unit</directory>
         </testsuite>
     </testsuites>
-
     <php>
-        <env name="ROOT_DIR" value="/Users/calvinalkan/valet/wp-hooks/better-wordpress-hooks"/>
+<!--        <env name="ROOT_DIR" value="/Users/calvinalkan/valet/wp-hooks/better-wordpress-hooks"/>-->
     </php>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage"
