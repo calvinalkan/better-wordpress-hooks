@@ -7,6 +7,7 @@
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\Exceptions\TestException;
     use BetterWpHooks\Exceptions\UnremovableListenerException;
+    use BetterWpHooks\Testing\BetterWpHooksTestCase;
     use BetterWpHooks\Testing\FakeDispatcher;
     use Codeception\AssertThrows;
     use PHPUnit\Framework\TestCase;
@@ -20,7 +21,7 @@
     use Tests\TestStubs\Plugin1;
     use Tests\TestStubs\Plugin2;
 
-    class BetterWpHooksTest extends TestCase
+    class BetterWpHooksTest extends BetterWpHooksTestCase
     {
 
         use AssertThrows;
@@ -29,30 +30,19 @@
 
         protected function setUp() : void
         {
-
-
             parent::setUp();
 
-            $plugin_php = dirname(__DIR__, 2).'/vendor/calvinalkan/wordpress-hook-api-clone/plugin.php';
-
-            require_once $plugin_php;
-
-            $this->assertEmpty($GLOBALS['wp_filter']);
-            $this->assertEmpty($GLOBALS['wp_actions']);
-            $this->assertEmpty($GLOBALS['wp_current_filter']);
-
+            $this->setUpWp(VENDOR_DIR);
 
         }
 
         protected function tearDown() : void
         {
 
-            parent::tearDown();
-
             $this->reset();
 
-            self::assertNull(Plugin1::getInstance());
-            self::assertNull(Plugin2::getInstance());
+            parent::tearDown();
+
 
         }
 
@@ -916,13 +906,16 @@
 
             Plugin1::boot();
 
+            $this->assertTrue(
+                Plugin1::dispatcher()->hasListenerFor('closure', Event1::class)
+            );
+
             Plugin1::forgetOne(Event1::class, 'closure');
 
-            $this->assertDoesNotThrow(TestException::class, function () {
+            $this->assertFalse(
+                Plugin1::dispatcher()->hasListenerFor('closure', Event1::class)
+            );
 
-                Plugin1::dispatch(new Event1('foo', 'bar'));
-
-            });
 
 
         }
@@ -1330,7 +1323,6 @@
 
         }
 
-
         private function newPlugin1()
         {
 
@@ -1340,24 +1332,11 @@
 
         }
 
-        private function newPlugin2()
-        {
-
-            $container2 = new BaseContainerAdapter();
-
-            Plugin2::make($container2);
-
-        }
-
         private function reset() : void
         {
 
-
-            $GLOBALS['wp_filter'] = [];
-            $GLOBALS['wp_actions'] = [];
-            $GLOBALS['wp_current_filter'] = [];
+            $this->tearDownWp();
             $_SERVER['dispatch'] = null;
-
             Plugin1::setInstance(null);
             Plugin2::setInstance(null);
 
@@ -1380,7 +1359,6 @@
 
 
     }
-
 
     class EventWithDependency extends Plugin1
     {
@@ -1418,8 +1396,6 @@
 
     }
 
-
-
     class EventNoParams extends Plugin1
     {
 
@@ -1434,7 +1410,6 @@
 
 
     }
-
 
     class Filterable extends Plugin1
     {
@@ -1459,13 +1434,11 @@
 
     }
 
-
     class WpLoaded extends Plugin1
     {
 
 
     }
-
 
     class CurrentScreen extends Plugin1
     {
@@ -1484,7 +1457,6 @@
 
     }
 
-
     class ArrayAction extends Plugin1
     {
 
@@ -1498,7 +1470,6 @@
         }
 
     }
-
 
     class BlogTitle extends Plugin1
     {
@@ -1522,7 +1493,6 @@
 
 
     }
-
 
     class CheckoutPrice extends Plugin1
     {
@@ -1548,7 +1518,6 @@
         }
 
     }
-
 
     class AdminUsers extends Plugin1
     {

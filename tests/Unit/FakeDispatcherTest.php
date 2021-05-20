@@ -15,7 +15,7 @@
     {
 
         /**
-         * @var \BetterWpHooks\Testing\FakeDispatcher
+         * @var FakeDispatcher
          */
         private $fake;
 

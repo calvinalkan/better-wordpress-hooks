@@ -7,7 +7,7 @@
 	class BetterWpHooksTestCase extends TestCase {
 	
 		
-		public function setUpWp( string $vendor_dir ) {
+		public function setUpWp( string $vendor_dir = '' ) {
 
             $ds = DIRECTORY_SEPARATOR;
 
@@ -15,11 +15,11 @@
 
 			if ( ! file_exists( $plugin_php ) ) {
 
-				throw new \Exception('The file: ../vendor/calvinalkan/wordpress-hook-api-clone/plugin.php does not exists.');
+				throw new \Exception('The file: ' . $plugin_php . ' does not exists.');
 
 			}
 
-			if ( ! class_exists(\WP_Hook::class) ) {
+			if ( ! class_exists(\WP_Hook::class ) ) {
 
                 require_once $plugin_php;
 

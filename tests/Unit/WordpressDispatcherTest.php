@@ -8,9 +8,9 @@
 	use BetterWpHooks\Exceptions\TestException;
 	use BetterWpHooks\Exceptions\UnremovableListenerException;
 	use BetterWpHooks\ListenerFactory;
-	use BetterWpHooks\WordpressApi;
+    use BetterWpHooks\Testing\BetterWpHooksTestCase;
+    use BetterWpHooks\WordpressApi;
 	use Codeception\AssertThrows;
-	use PHPUnit\Framework\TestCase;
 	use SniccoAdapter\BaseContainerAdapter;
 	use stdClass;
 	use Tests\CustomAssertions;
@@ -34,7 +34,7 @@
 	use Tests\TestListeners\ThrowExceptionListener;
 	
 	
-	class WordpressDispatcherTest extends TestCase {
+	class WordpressDispatcherTest extends BetterWpHooksTestCase {
 		
 		use AssertThrows;
 		use CustomAssertions;
@@ -49,13 +49,7 @@
 			
 			parent::setUp();
 			
-			$plugin_php = dirname( __DIR__, 2 ) . '/vendor/calvinalkan/wordpress-hook-api-clone/plugin.php';
-			
-			require_once $plugin_php;
-			
-			$this->assertEmpty( $GLOBALS['wp_filter'] );
-			$this->assertEmpty( $GLOBALS['wp_actions'] );
-			$this->assertEmpty( $GLOBALS['wp_current_filter'] );
+			$this->setUpWp(VENDOR_DIR);
 			
 			$this->wp         = new WordpressApi();
 			$this->dispatcher = new WordpressDispatcher(
@@ -1194,10 +1188,7 @@
 
 		private function reset(): void {
 			
-			
-			$GLOBALS['wp_filter']         = [];
-			$GLOBALS['wp_actions']        = [];
-			$GLOBALS['wp_current_filter'] = [];
+			$this->tearDownWp();
 			
 			$this->dispatcher = new WordpressDispatcher(
 				
