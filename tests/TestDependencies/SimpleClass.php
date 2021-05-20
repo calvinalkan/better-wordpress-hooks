@@ -4,6 +4,6 @@
 	
 	class SimpleClass {
 
-		public $message = 'simple class. ';
+		public $message = 'simple class.';
 
 	}

@@ -396,10 +396,9 @@
 
             });
 
-            $this->assertSame('simple class. ', apply_filters('init', 'null'));
+            $this->assertSame('simple class.', apply_filters('init', 'null'));
 
         }
-
 
 
 
@@ -1322,6 +1321,7 @@
 
 
         }
+
 
         private function newPlugin1()
         {

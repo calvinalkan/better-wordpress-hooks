@@ -187,9 +187,6 @@
 
 
 
-
-
-
 		/**
 		 *
 		 *
@@ -1179,7 +1176,7 @@
 
             });
             $event = new EventWithDefaultLogic();
-            $return = $this->dispatcher->dispatch($event);
+            $this->dispatcher->dispatch($event);
 
 
         }
