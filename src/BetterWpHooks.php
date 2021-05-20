@@ -5,6 +5,7 @@
 
     use BetterWpHooks\Contracts\EventMapper;
     use BetterWpHooks\Contracts\Dispatcher;
+    use BetterWpHooks\Dispatchers\WordpressDispatcher;
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\Mappers\WordpressEventMapper;
     use BetterWpHooks\Traits\ReflectsCallable;
@@ -12,7 +13,6 @@
 
     class BetterWpHooks
     {
-
 
 
         /**
@@ -86,10 +86,29 @@
 
         }
 
-        public function swapDispatcher(Dispatcher $new_dispatcher)
+        public function swapDispatcher(Dispatcher $new_dispatcher, bool $swap_in_container)
         {
 
             $this->dispatcher = $new_dispatcher;
+
+            if ( ! $swap_in_container ) {
+
+                return;
+
+            }
+
+            if ($this->container()->offsetExists(WordpressDispatcher::class)) {
+
+                $this->container()->instance(WordpressDispatcher::class, $new_dispatcher);
+
+            }
+
+            if ($this->container()->offsetExists(Dispatcher::class)) {
+
+                $this->container()->instance(Dispatcher::class, $new_dispatcher);
+
+            }
+
 
         }
 
@@ -147,7 +166,6 @@
 
 
         }
-
 
 
     }

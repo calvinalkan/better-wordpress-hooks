@@ -232,18 +232,21 @@
         /**
          * Replace the bound instance with a fake.
          *
-         * @param  array|string  $eventsToFake
+         * @param  array|string  $events_to_fake
+         * @param  bool  $swap_in_container
          *
          * @return FakeDispatcher
          */
-        public static function fake($eventsToFake = []) : FakeDispatcher
+        public static function fake( $events_to_fake = [], bool $swap_in_container = true ) : FakeDispatcher
         {
 
-            $event_fake = new FakeDispatcher(self::$instance->dispatcher(), $eventsToFake);
+            $events_to_fake = Arr::wrap($events_to_fake);
 
-            self::$instance->swapDispatcher($event_fake);
+            $fake_dispatcher = new FakeDispatcher(self::$instance->dispatcher(), $events_to_fake);
 
-            return $event_fake;
+            self::$instance->swapDispatcher($fake_dispatcher, $swap_in_container);
+
+            return $fake_dispatcher;
 
 
         }
