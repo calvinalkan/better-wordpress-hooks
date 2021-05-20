@@ -21,8 +21,8 @@ jobs:
       # Run composer install
       - run: composer install --no-interaction
       # TEST
-      - run: phpdbg -qrr vendor/bin/phpunit --testsuite unit --coverage-html build/coverage-report --log-junit build/results/results.xml
       - run: phpdbg -qrr vendor/bin/phpunit --testsuite test_case --coverage-html build/coverage-report --log-junit build/results/results.xml
+      - run: phpdbg -qrr vendor/bin/phpunit --testsuite unit --coverage-html build/coverage-report --log-junit build/results/results.xml
       # save test results
       - store_test_results:
           path: build/results

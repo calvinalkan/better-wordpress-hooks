@@ -4,8 +4,10 @@
     namespace Tests\Unit;
 
     use BetterWpHooks\BetterWpHooks;
+    use BetterWpHooks\Contracts\Dispatcher;
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\Mappers\WordpressEventMapper;
+    use BetterWpHooks\Testing\FakeDispatcher;
     use PHPUnit\Framework\Constraint\ExceptionMessage;
     use PHPUnit\Framework\ExpectationFailedException;
     use PHPUnit\Framework\TestCase;
@@ -20,47 +22,47 @@
 
         private const class_namespace = EventFakeStub::class;
 
-        protected function setUp () : void
+        protected function setUp() : void
         {
 
             parent::setUp();
             $this->newPlugin1();
         }
 
-        protected function tearDown () : void
+        protected function tearDown() : void
         {
 
             parent::tearDown();
         }
 
-        public function testAssertDispatched ()
+        public function testAssertDispatched()
         {
 
             try {
 
                 Plugin1::fake();
-                Plugin1::assertDispatched( EventFakeStub::class );
+                Plugin1::assertDispatched(EventFakeStub::class);
                 $this->fail();
 
             }
-            catch ( ExpectationFailedException $e ) {
+            catch (ExpectationFailedException $e) {
 
                 $this->assertThat(
                     $e,
                     new ExceptionMessage(
-                        'The expected [' . self::class_namespace . '] event was not dispatched.'
+                        'The expected ['.self::class_namespace.'] event was not dispatched.'
                     )
                 );
 
             }
 
-            Plugin1::dispatch( EventFakeStub::class );
+            Plugin1::dispatch(EventFakeStub::class);
 
-            Plugin1::assertDispatched( EventFakeStub::class );
+            Plugin1::assertDispatched(EventFakeStub::class);
 
         }
 
-        public function testAssertDispatchedWithClosure ()
+        public function testAssertDispatchedWithClosure()
         {
 
             Plugin1::fake();
@@ -68,10 +70,10 @@
             $event_stub = new EventFakeStub();
             $event_stub->creator = 'calvinalkan';
 
-            Plugin1::dispatch( $event_stub );
+            Plugin1::dispatch($event_stub);
 
             Plugin1::assertDispatched(
-                function( EventFakeStub $event ) {
+                function (EventFakeStub $event) {
 
                     return $event->creator === 'calvinalkan';
                 }
@@ -79,82 +81,82 @@
 
         }
 
-        public function testAssertDispatchedWithCallbackInt ()
+        public function testAssertDispatchedWithCallbackInt()
         {
 
             Plugin1::fake();
 
-            Plugin1::dispatch( EventFakeStub::class );
-            Plugin1::dispatch( EventFakeStub::class );
+            Plugin1::dispatch(EventFakeStub::class);
+            Plugin1::dispatch(EventFakeStub::class);
 
             try {
 
-                Plugin1::assertDispatched( EventFakeStub::class, 1 );
+                Plugin1::assertDispatched(EventFakeStub::class, 1);
                 $this->fail();
 
             }
-            catch ( ExpectationFailedException $e ) {
+            catch (ExpectationFailedException $e) {
 
                 $this->assertThat(
                     $e,
                     new ExceptionMessage(
-                        'The expected [' . self::class_namespace . '] event was dispatched 2 times instead of 1 times.'
+                        'The expected ['.self::class_namespace.'] event was dispatched 2 times instead of 1 times.'
                     )
                 );
 
             }
 
-            Plugin1::assertDispatched( EventFakeStub::class, 2 );
+            Plugin1::assertDispatched(EventFakeStub::class, 2);
 
         }
 
-        public function testAssertDispatchedTimes ()
+        public function testAssertDispatchedTimes()
         {
 
             Plugin1::fake();
 
-            Plugin1::dispatch( EventFakeStub::class );
-            Plugin1::dispatch( EventFakeStub::class );
+            Plugin1::dispatch(EventFakeStub::class);
+            Plugin1::dispatch(EventFakeStub::class);
 
             try {
-                Plugin1::assertDispatchedTimes( EventFakeStub::class, 1 );
+                Plugin1::assertDispatchedTimes(EventFakeStub::class, 1);
                 $this->fail();
             }
-            catch ( ExpectationFailedException $e ) {
+            catch (ExpectationFailedException $e) {
                 $this->assertThat(
                     $e, new ExceptionMessage(
-                          'The expected [' . self::class_namespace . '] event was dispatched 2 times instead of 1 times.'
-                      )
+                        'The expected ['.self::class_namespace.'] event was dispatched 2 times instead of 1 times.'
+                    )
                 );
             }
 
-            Plugin1::assertDispatchedTimes( EventFakeStub::class, 2 );
+            Plugin1::assertDispatchedTimes(EventFakeStub::class, 2);
         }
 
-        public function testAssertNotDispatched ()
+        public function testAssertNotDispatched()
         {
 
             Plugin1::fake();
 
-            Plugin1::assertNotDispatched( EventFakeStub::class );
+            Plugin1::assertNotDispatched(EventFakeStub::class);
 
-            Plugin1::dispatch( EventFakeStub::class );
+            Plugin1::dispatch(EventFakeStub::class);
 
             try {
-                Plugin1::assertNotDispatched( EventFakeStub::class );
+                Plugin1::assertNotDispatched(EventFakeStub::class);
                 $this->fail();
             }
-            catch ( ExpectationFailedException $e ) {
+            catch (ExpectationFailedException $e) {
 
                 $this->assertThat(
                     $e, new ExceptionMessage(
-                          'The unexpected [' . self::class_namespace . '] event was dispatched.'
-                      )
+                        'The unexpected ['.self::class_namespace.'] event was dispatched.'
+                    )
                 );
             }
         }
 
-        public function testAssertNotDispatchedWithClosure ()
+        public function testAssertNotDispatchedWithClosure()
         {
 
 
@@ -163,12 +165,12 @@
             $event_stub = new EventFakeStub();
             $event_stub->creator = 'calvinalkan';
 
-            Plugin1::dispatch( $event_stub );
+            Plugin1::dispatch($event_stub);
 
             try {
 
                 Plugin1::assertNotDispatched(
-                    function( EventFakeStub $event ) use ( $event_stub ) {
+                    function (EventFakeStub $event) use ($event_stub) {
 
                         return 'calvinalkan' === $event_stub->creator;
 
@@ -178,18 +180,18 @@
                 $this->fail();
 
             }
-            catch ( ExpectationFailedException $e ) {
+            catch (ExpectationFailedException $e) {
 
                 $this->assertThat(
                     $e, new ExceptionMessage(
-                          'The unexpected [' . self::class_namespace . '] event was dispatched.'
-                      )
+                        'The unexpected ['.self::class_namespace.'] event was dispatched.'
+                    )
                 );
 
             }
         }
 
-        public function testAssertNothingDispatched ()
+        public function testAssertNothingDispatched()
         {
 
 
@@ -197,33 +199,33 @@
 
             Plugin1::assertNothingDispatched();
 
-            Plugin1::dispatch( EventFakeStub::class );
-            Plugin1::dispatch( EventFakeStub::class );
+            Plugin1::dispatch(EventFakeStub::class);
+            Plugin1::dispatch(EventFakeStub::class);
 
             try {
                 Plugin1::assertNothingDispatched();
                 $this->fail();
             }
-            catch ( ExpectationFailedException $e ) {
+            catch (ExpectationFailedException $e) {
                 $this->assertThat(
-                    $e, new ExceptionMessage( '2 unexpected events were dispatched.' )
+                    $e, new ExceptionMessage('2 unexpected events were dispatched.')
                 );
             }
 
 
         }
 
-        public function testAssertDispatchedWithIgnore ()
+        public function testAssertDispatchedWithIgnore()
         {
 
-            $dispatcher = m::spy( WordpressDispatcher::class );
-            $event_mapper = m::mock( WordpressEventMapper::class );
+            $dispatcher = m::spy(WordpressDispatcher::class);
+            $event_mapper = m::mock(WordpressEventMapper::class);
             $container = new BaseContainerAdapter();
 
             $events_to_fake = [
 
                 'Foo',
-                function( $event, $payload ) {
+                function ($event, $payload) {
 
                     return $event === 'Bar' && $payload['id'] === 1;
                 },
@@ -236,36 +238,36 @@
                 )
             );
 
-            Plugin1::fake( $events_to_fake );
+            Plugin1::fake($events_to_fake);
 
             // Should not dispatch
-            Plugin1::dispatch( 'Foo' );
+            Plugin1::dispatch('Foo');
             // Should not dispatch
-            Plugin1::dispatch( 'Bar', [ 'id' => 1 ] );
+            Plugin1::dispatch('Bar', ['id' => 1]);
             // Should dispatch
-            Plugin1::dispatch( 'Baz', [ 'id' => 1 ] );
+            Plugin1::dispatch('Baz', ['id' => 1]);
 
-            Plugin1::assertDispatched( 'Foo' );
-            Plugin1::assertDispatched( 'Bar' );
-            Plugin1::assertDispatched( 'Baz' );
-            Plugin1::assertNotDispatched( 'Biz' );
+            Plugin1::assertDispatched('Foo');
+            Plugin1::assertDispatched('Bar');
+            Plugin1::assertDispatched('Baz');
+            Plugin1::assertNotDispatched('Biz');
 
-            $dispatcher->shouldHaveReceived( 'dispatch' )->once()->with( 'Baz', [ 'id' => 1 ] );
+            $dispatcher->shouldHaveReceived('dispatch')->once()->with('Baz', ['id' => 1]);
 
 
         }
 
-        public function testExceptionWhenInstanceWasNotFakes ()
+        public function testExceptionWhenInstanceWasNotFakes()
         {
 
             try {
 
-                Plugin1::assertDispatched( EventFakeStub::class );
+                Plugin1::assertDispatched(EventFakeStub::class);
                 $this->fail();
 
             }
 
-            catch ( ConfigurationException $e ) {
+            catch (ConfigurationException $e) {
 
                 $this->assertSame(
                     'Did you forget to set up the FakeDispatcher with {YourFacadeClass}::fake()?',
@@ -276,12 +278,12 @@
 
             try {
 
-                Plugin1::assertDispatchedTimes( EventFakeStub::class, 1 );
+                Plugin1::assertDispatchedTimes(EventFakeStub::class, 1);
                 $this->fail();
 
             }
 
-            catch ( ConfigurationException $e ) {
+            catch (ConfigurationException $e) {
 
                 $this->assertSame(
                     'Did you forget to set up the FakeDispatcher with {YourFacadeClass}::fake()?',
@@ -292,12 +294,12 @@
 
             try {
 
-                Plugin1::assertNotDispatched( EventFakeStub::class );
+                Plugin1::assertNotDispatched(EventFakeStub::class);
                 $this->fail();
 
             }
 
-            catch ( ConfigurationException $e ) {
+            catch (ConfigurationException $e) {
 
                 $this->assertSame(
                     'Did you forget to set up the FakeDispatcher with {YourFacadeClass}::fake()?',
@@ -313,7 +315,7 @@
 
             }
 
-            catch ( ConfigurationException $e ) {
+            catch (ConfigurationException $e) {
 
                 $this->assertSame(
                     'Did you forget to set up the FakeDispatcher with {YourFacadeClass}::fake()?',
@@ -325,12 +327,102 @@
 
         }
 
-        private function newPlugin1 ()
+        /** @test */
+        public function the_container_dispatcher_instance_gets_swapped_by_default_when_events_are_faked()
+        {
+
+            $container = Plugin1::container();
+
+            $container->instance(
+                WordpressDispatcher::class,
+                Plugin1::dispatcher()
+            );
+
+            $container->instance(
+                Dispatcher::class,
+                Plugin1::dispatcher()
+            );
+
+            $this->assertInstanceOf(
+                WordpressDispatcher::class,
+                $container->make(WordpressDispatcher::class)
+            );
+
+             $this->assertInstanceOf(
+                 WordpressDispatcher::class,
+                $container->make(Dispatcher::class)
+            );
+
+
+            Plugin1::fake();
+
+            $this->assertInstanceOf(
+                FakeDispatcher::class,
+                $container->make(WordpressDispatcher::class)
+            );
+
+             $this->assertInstanceOf(
+                FakeDispatcher::class,
+                $container->make(Dispatcher::class)
+            );
+
+
+
+
+        }
+
+        /** @test */
+        public function swapping_in_the_container_can_be_disabled_with_a_flag()
+        {
+
+            $container = Plugin1::container();
+
+            $container->instance(
+                WordpressDispatcher::class,
+                Plugin1::dispatcher()
+            );
+
+            $container->instance(
+                Dispatcher::class,
+                Plugin1::dispatcher()
+            );
+
+            $this->assertInstanceOf(
+                WordpressDispatcher::class,
+                $container->make(WordpressDispatcher::class)
+            );
+
+             $this->assertInstanceOf(
+                 WordpressDispatcher::class,
+                $container->make(Dispatcher::class)
+            );
+
+
+            Plugin1::fake([], false);
+
+            $this->assertInstanceOf(
+                WordpressDispatcher::class,
+                $container->make(WordpressDispatcher::class)
+            );
+
+             $this->assertInstanceOf(
+                 WordpressDispatcher::class,
+                $container->make(Dispatcher::class)
+            );
+
+
+
+
+        }
+
+
+
+        private function newPlugin1()
         {
 
             $container1 = new BaseContainerAdapter();
 
-            Plugin1::make( $container1 );
+            Plugin1::make($container1);
 
         }
 
