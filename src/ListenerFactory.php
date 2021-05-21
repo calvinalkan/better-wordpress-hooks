@@ -113,7 +113,9 @@
 			return function ( $payload ) use ( $listener ) {
 				
 				try {
-					
+
+				    $payload = $this->stripEmptyString($payload);
+
 					return $listener->shouldHandle( $payload ) ? $listener->execute( $payload ) : $payload;
 					
 				} catch ( \Throwable $e ) {
@@ -126,6 +128,30 @@
 			};
 			
 		}
+
+        /**
+         *
+         * Wordpress adds an empty string to hooks args without parameters like do_action('init').
+         * This will result in the payload being [0=>''] which might mess up our dynamic payload building
+         * in some edge cases.
+         *
+         * @see https://github.com/WordPress/WordPress/blob/master/wp-includes/plugin.php#L464
+         *
+         * @param $payload
+         *
+         * @return array|mixed
+         */
+		private function stripEmptyString($payload) {
+
+		    if ($payload === '') {
+
+		        return [];
+
+            }
+
+		    return  $payload;
+
+        }
 		
 		
 	}
