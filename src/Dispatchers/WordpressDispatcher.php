@@ -179,9 +179,9 @@
 
             }
 
-            $filtered = $this->hook_api->applyFilter($event, $payload);
+            $filtered = $this->hook_api->applyFilter( $event, $payload );
 
-            if ($filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered)) {
+            if ( $filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered) ) {
 
                 return $this->determineDefault($payload, $filtered);
 
@@ -495,7 +495,6 @@
          */
         private function parseEventAndPayload($event, $payload) : array
         {
-
 
             if (is_object($event)) {
 

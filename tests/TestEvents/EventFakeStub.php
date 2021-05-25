@@ -5,5 +5,7 @@
 	class EventFakeStub {
 		
 		public $creator;
-		
-	}
+
+
+
+    }

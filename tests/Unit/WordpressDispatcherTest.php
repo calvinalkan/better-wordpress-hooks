@@ -11,12 +11,14 @@
     use BetterWpHooks\Testing\BetterWpHooksTestCase;
     use BetterWpHooks\WordpressApi;
 	use Codeception\AssertThrows;
-	use SniccoAdapter\BaseContainerAdapter;
+    use Illuminate\Support\Facades\Event;
+    use SniccoAdapter\BaseContainerAdapter;
 	use stdClass;
 	use Tests\CustomAssertions;
 	use Tests\TestDependencies\ComplexListener;
 	use Tests\TestDependencies\ComplexMethodDependency;
 	use Tests\TestEvents\ConditionalEvent;
+    use Tests\TestEvents\EventFakeStub;
     use Tests\TestEvents\EventWithDefaultLogic;
     use Tests\TestEvents\EventWithDefaultNoTypeHit;
     use Tests\TestEvents\EventWithDefaults;
@@ -1181,7 +1183,30 @@
 
         }
 
+        /** @test */
+        public function wordpress_actions_work_and_receive_the_same_payload_without_needing_a_return_value () {
 
+            $event = new EventFakeStub();
+
+            $closure1 = function (EventFakeStub $event_object) use ($event) {
+
+                $this->assertSame($event_object, $event);
+
+            };
+
+            $closure2 = function (EventFakeStub $event_object) use ($event) {
+
+                $this->assertSame($event_object, $event);
+
+
+            };
+
+            $this->dispatcher->listen(EventFakeStub::class, $closure1);
+            $this->dispatcher->listen(EventFakeStub::class, $closure2);
+
+            $this->dispatcher->dispatch( $event);
+
+        }
 
 		private function reset(): void {
 			

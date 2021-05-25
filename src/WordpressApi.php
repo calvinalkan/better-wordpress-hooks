@@ -2,7 +2,8 @@
 	
 	namespace BetterWpHooks;
 	
-	/**
+
+    /**
 	 *
 	 * Simple Wrapper Class around the Wordpress Plugin Api
 	 * Used to allow swapping during testing.
@@ -12,14 +13,13 @@
 	 * @package BetterWpHooks
 	 */
 	class WordpressApi {
-		
-		public function applyFilter( $event, ...$payload ) {
-			
+
+		public function applyFilter( $event , ...$payload ) {
+
 			return apply_filters( $event, ...$payload );
 			
 		}
-		
-		
+
 		public function hasFilterFor( $event, $callback = NULL ): bool {
 			
 			// WP returns the hook priority if a hook exists and a cb is passed
