@@ -1,20 +1,29 @@
 <?php
-	
-	namespace BetterWpHooks;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks;
 	
 
-    /**
-	 *
-	 * Simple Wrapper Class around the Wordpress Plugin Api
-	 * Used to allow swapping during testing.
-	 *
-	 * Class WordpressApi
-	 *
-	 * @package BetterWpHooks
-	 */
+    use BetterWpHooks\Traits\IsAction;
+
+    use function BetterWpHooks\Functions\classExists;
+
+
 	class WordpressApi {
 
 		public function applyFilter( $event , ...$payload ) {
+
+		    if ( $this->isDispatchingAction($event) ) {
+
+		        do_action($event, ...$payload);
+
+		        // stay close to WP which also return '' for do_action()
+		        return '';
+
+            }
 
 			return apply_filters( $event, ...$payload );
 			
@@ -44,6 +53,18 @@
 			add_filter( $event, $listener, $priority, $args );
 			
 		}
-		
+
+		private function isDispatchingAction( $event ) : bool
+        {
+
+            if ( classExists($event) && in_array(IsAction::class, class_uses($event) ) ) {
+
+                return true;
+
+            }
+
+            return false;
+
+        }
 		
 	}

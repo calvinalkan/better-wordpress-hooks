@@ -173,7 +173,7 @@
 
             $this->maybeStopPropagation($event);
 
-            if ( ! $this->hasListeners($event)) {
+            if ( ! $this->hasListeners($event) ) {
 
                 return $this->determineDefault($payload, null);
 

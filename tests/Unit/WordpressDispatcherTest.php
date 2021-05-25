@@ -17,7 +17,8 @@
 	use Tests\CustomAssertions;
 	use Tests\TestDependencies\ComplexListener;
 	use Tests\TestDependencies\ComplexMethodDependency;
-	use Tests\TestEvents\ConditionalEvent;
+    use Tests\TestEvents\ActionEvent;
+    use Tests\TestEvents\ConditionalEvent;
     use Tests\TestEvents\EventFakeStub;
     use Tests\TestEvents\EventWithDefaultLogic;
     use Tests\TestEvents\EventWithDefaultNoTypeHit;
@@ -1186,25 +1187,25 @@
         /** @test */
         public function wordpress_actions_work_and_receive_the_same_payload_without_needing_a_return_value () {
 
-            $event = new EventFakeStub();
+            $event = new ActionEvent();
 
-            $closure1 = function (EventFakeStub $event_object) use ($event) {
+            $closure1 = function (ActionEvent $event_object) use ($event) {
 
                 $this->assertSame($event_object, $event);
 
             };
 
-            $closure2 = function (EventFakeStub $event_object) use ($event) {
+            $closure2 = function (ActionEvent $event_object) use ($event) {
 
                 $this->assertSame($event_object, $event);
 
 
             };
 
-            $this->dispatcher->listen(EventFakeStub::class, $closure1);
-            $this->dispatcher->listen(EventFakeStub::class, $closure2);
+            $this->dispatcher->listen(ActionEvent::class, $closure1);
+            $this->dispatcher->listen(ActionEvent::class, $closure2);
 
-            $this->dispatcher->dispatch( $event);
+            $this->dispatcher->dispatch( $event );
 
         }
 
