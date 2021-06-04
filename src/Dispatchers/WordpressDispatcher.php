@@ -551,7 +551,6 @@
         private function createListener($event, $key, array $listener) : Closure
         {
 
-
             $listener = $this->listener_factory->create($listener);
 
             if ($this->isDuplicate($event, $listener)) {
