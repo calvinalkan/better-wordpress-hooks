@@ -19,6 +19,8 @@
 
     use ReflectionException;
 
+    use ReflectionMethod;
+
     use function BetterWpHooks\Functions\arrayFirst;
     use function BetterWpHooks\Functions\classNameIfClassExists;
     use function BetterWpHooks\Functions\hasTrait;
@@ -169,22 +171,22 @@
                 return;
             }
 
-            [$event, $payload] = $this->parseEventAndPayload($event, $payload);
+            [$event, $payload, $original_event_object ] = $this->parseEventAndPayload($event, $payload);
 
             $this->maybeStopPropagation($event);
 
-            if ( ! $this->hasListeners($event) ) {
+            if ( ! $this->hasListeners( $event ) ) {
 
-                return $this->determineDefault($payload, null);
+                return $this->determineDefault($payload, null, $original_event_object);
 
             }
 
             $filtered = $this->hook_api->applyFilter( $event, $payload );
 
 
-            if ( $filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered) ) {
+            if ( $filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered, $original_event_object) ) {
 
-                return $this->determineDefault($payload, $filtered);
+                return $this->determineDefault($payload, $filtered, $original_event_object);
 
             }
 
@@ -448,16 +450,23 @@
 
         }
 
-        private function isCorrectReturnValue($payload, $filtered) : bool
+        private function isCorrectReturnValue($payload, $filtered, ?object $original_event_object) : bool
         {
+            $event_object = is_object($payload)
+                ? $payload
+                : $original_event_object;
 
-            if ( ! is_callable([$payload, 'default'])) {
+            if ( $event_object === null ) {
+                return true;
+            }
+
+            if ( ! is_callable([$event_object, 'default'])) {
 
                 return true;
 
             }
 
-            $method = new \ReflectionMethod($payload, 'default');
+            $method = new ReflectionMethod($event_object, 'default');
 
             if ( ! $method->hasReturnType()) {
 
@@ -471,12 +480,18 @@
 
         }
 
-        private function determineDefault($payload, $filtered)
+        private function determineDefault($payload, $filtered, ?object $original_event_object)
         {
 
             if (is_callable([$payload, 'default'])) {
 
                 return $payload->default($payload, $filtered);
+
+            }
+
+            if ( $original_event_object && is_callable([$original_event_object, 'default'] ) ) {
+
+                return $original_event_object->default($payload, $filtered);
 
             }
 
@@ -496,16 +511,21 @@
          */
         private function parseEventAndPayload($event, $payload) : array
         {
+            $original_event_object = null;
 
             if (is_object($event)) {
 
-                $payload = method_exists($event, 'payload') ? $event->payload() : $event;
+                $payload = method_exists($event, 'payload') ? $event->payload() :$event;
+
+                if ( ! is_object( $payload ) ) {
+                    $original_event_object = $event;
+                }
 
                 [$payload, $event] = [$payload, get_class($event)];
 
             }
 
-            return [$event, $payload];
+            return [$event, $payload, $original_event_object];
 
 
         }

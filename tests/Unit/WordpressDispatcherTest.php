@@ -48,7 +48,6 @@
 
         private $wp;
 
-
         protected function setUp() : void
         {
 
@@ -67,7 +66,6 @@
 
         }
 
-
         protected function tearDown() : void
         {
 
@@ -76,7 +74,6 @@
             $this->reset();
 
         }
-
 
 
         /**

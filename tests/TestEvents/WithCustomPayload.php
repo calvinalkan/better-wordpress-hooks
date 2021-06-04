@@ -17,4 +17,10 @@
 
         }
 
+        public function default () :string {
+
+            return $this->payload;
+
+        }
+
     }
