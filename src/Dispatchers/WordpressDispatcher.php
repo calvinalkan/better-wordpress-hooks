@@ -16,7 +16,6 @@
     use Exception;
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
-
     use ReflectionException;
 
     use function BetterWpHooks\Functions\arrayFirst;
@@ -147,7 +146,6 @@
 
 
         }
-
 
         /**
          * Dispatch an event and call all the listeners.

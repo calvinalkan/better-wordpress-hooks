@@ -3,13 +3,12 @@
 	namespace BetterWpHooks\Listeners;
 	
 	use BetterWpHooks\Contracts\AbstractListener;
-	use BetterWpHooks\Traits\ReflectsCallable;
 	use Contracts\ContainerAdapter;
-	
-	class ClosureListener extends AbstractListener {
+    use ReflectionPayload\ReflectionPayload;
+
+    class ClosureListener extends AbstractListener {
 		
-		use ReflectsCallable;
-		
+
 		/**
 		 * @var \Closure
 		 */
@@ -41,9 +40,12 @@
 		public function execute( $payload ) {
 			
 			$closure = $this->closure;
-			
-			return $this->container->call( $closure , $this->buildParameterNames(  $closure , $payload) );
-			
+
+			$reflection_payload = new ReflectionPayload($closure, $payload);
+            $payload = $reflection_payload->build();
+
+			return $this->container->call( $closure , $payload );
+
 			
 		}
 		

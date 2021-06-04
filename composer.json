@@ -14,7 +14,8 @@
     "php": "^7.3",
     "illuminate/support": "8.35.1",
     "calvinalkan/base-container": "0.1.5",
-    "calvinalkan/wordpress-hook-api-clone": "5.7.2"
+    "calvinalkan/wordpress-hook-api-clone": "5.7.2",
+    "calvin/reflection-payload": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.0",

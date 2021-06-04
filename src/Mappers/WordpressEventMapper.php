@@ -4,15 +4,14 @@
 	
 	use BetterWpHooks\Contracts\Dispatcher;
     use BetterWpHooks\Contracts\EventMapper;
-    use BetterWpHooks\Traits\ReflectsCallable;
     use BetterWpHooks\WordpressApi;
     use Closure;
     use Contracts\ContainerAdapter;
     use Illuminate\Support\Arr;
+    use ReflectionPayload\ReflectionPayload;
 
     class WordpressEventMapper implements EventMapper {
 
-        use ReflectsCallable;
 
         const resolve_key = 'resolve';
 
@@ -95,9 +94,9 @@
 
                 });
 
-                $payload = $this->buildNamedConstructorArgs($event, $args->all());
+                $payload = new ReflectionPayload($event, $args->all());
 
-                $event_object = $this->container->make($event, $payload);
+                $event_object = $this->container->make($event, $payload->build());
 
                 return $this->dispatcher->dispatch($event_object);
 

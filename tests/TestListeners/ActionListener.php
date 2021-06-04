@@ -36,9 +36,9 @@
 			
 		}
 		
-		public function methodWithDependency( Dependency $dependency ) {
-			
-			
+		public function methodWithDependency( Dependency $dependency, $foo, $bar ) {
+
+
 		}
 		
 		public function foobarbiz( string $foo, string $bar, string $biz, SimpleMethodDependency $dependency ) {

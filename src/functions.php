@@ -78,7 +78,6 @@
         function normalizeClassMethod($callback, $default = null)
         {
 
-
             $first_element = Arr::first($callback);
 
             if (is_string($first_element) && Str::contains($first_element, '@')) {

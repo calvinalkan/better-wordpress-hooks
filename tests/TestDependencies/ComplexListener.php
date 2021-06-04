@@ -8,7 +8,7 @@
 		
 		
 		/**
-		 * @var \Tests\TestDependencies\ComplexConstructorDependency
+		 * @var ComplexConstructorDependency
 		 */
 		private  $complex_constructor_dependency;
 		
