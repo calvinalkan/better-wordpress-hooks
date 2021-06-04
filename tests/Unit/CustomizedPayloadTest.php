@@ -78,4 +78,38 @@
 
         }
 
+        /** @test */
+        public function default_values_work_when_the_event_object_has_a_customized_payload_and_no_listeners () {
+
+            $event = new WithCustomPayload();
+
+            $return_value = $this->dispatcher->dispatch($event);
+
+            $this->assertSame('PAYLOAD', $return_value);
+
+        }
+
+        /** @test */
+        public function default_values_work_with_smart_return_values () {
+
+            $event = new WithCustomPayload();
+            $GLOBALS['test']['closure_run'] = false;
+
+            $closure = function (string $payload) {
+
+                $GLOBALS['test']['closure_run'] = true;
+
+                return [$payload];
+
+            };
+
+            $this->dispatcher->listen(WithCustomPayload::class, $closure);
+            $filtered = $this->dispatcher->dispatch($event);
+
+            $this->assertSame('PAYLOAD', $filtered);
+            $this->assertTrue($GLOBALS['test']['closure_run']);
+
+        }
+
     }
+
