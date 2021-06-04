@@ -10,13 +10,11 @@
     use BetterWpHooks\Testing\BetterWpHooksTestCase;
     use BetterWpHooks\Testing\FakeDispatcher;
     use Codeception\AssertThrows;
-    use PHPUnit\Framework\TestCase;
     use SniccoAdapter\BaseContainerAdapter;
     use Tests\Exceptions\DidAction;
     use Tests\TestDependencies\SimpleClass;
     use Tests\TestListeners\ActionListener;
     use Tests\TestEvents\FilterableEvent;
-    use Tests\TestListeners\ListenerInterface;
     use Tests\TestStubs\DifferentContainer;
     use Tests\TestStubs\Plugin1;
     use Tests\TestStubs\Plugin2;

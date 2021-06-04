@@ -111,8 +111,7 @@
 				
 			);
 		}
-		
-		
+
 		/**
 		 * Asserts that callback does not throws an exception with a message
 		 *
@@ -173,8 +172,7 @@
 			
 			
 		}
-		
-		
+
 		public function assertNoListener( $callable, $event ) {
 			
 			$message = implode( ', ', Arr::wrap( classNameIfClassExists( $callable ) ) );
