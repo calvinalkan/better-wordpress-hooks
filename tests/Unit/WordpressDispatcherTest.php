@@ -11,12 +11,15 @@
     use BetterWpHooks\Testing\BetterWpHooksTestCase;
     use BetterWpHooks\WordpressApi;
 	use Codeception\AssertThrows;
-	use SniccoAdapter\BaseContainerAdapter;
+    use Illuminate\Support\Facades\Event;
+    use SniccoAdapter\BaseContainerAdapter;
 	use stdClass;
 	use Tests\CustomAssertions;
 	use Tests\TestDependencies\ComplexListener;
 	use Tests\TestDependencies\ComplexMethodDependency;
-	use Tests\TestEvents\ConditionalEvent;
+    use Tests\TestEvents\ActionEvent;
+    use Tests\TestEvents\ConditionalEvent;
+    use Tests\TestEvents\EventFakeStub;
     use Tests\TestEvents\EventWithDefaultLogic;
     use Tests\TestEvents\EventWithDefaultNoTypeHit;
     use Tests\TestEvents\EventWithDefaults;
@@ -1181,7 +1184,41 @@
 
         }
 
+        /** @test */
+        public function wordpress_actions_work_and_receive_the_same_payload_without_needing_a_return_value () {
 
+            $event = new ActionEvent();
+
+            $closure1 = function (ActionEvent $event_object) use ($event) {
+
+                $GLOBALS['test']['closure1'] = true;
+
+
+                $this->assertSame($event_object, $event);
+
+            };
+
+            $closure2 = function (ActionEvent $event_object) use ($event) {
+
+                $GLOBALS['test']['closure2'] = true;
+
+                $this->assertSame($event_object, $event);
+
+
+            };
+
+            $GLOBALS['test']['closure1'] = false;
+            $GLOBALS['test']['closure2'] = false;
+
+            $this->dispatcher->listen(ActionEvent::class, $closure1);
+            $this->dispatcher->listen(ActionEvent::class, $closure2);
+
+            $this->dispatcher->dispatch( $event );
+
+            $this->assertTrue($GLOBALS['test']['closure1']);
+            $this->assertTrue($GLOBALS['test']['closure2']);
+
+        }
 
 		private function reset(): void {
 			
