@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks\Functions {
 
         use Closure;
@@ -99,7 +102,7 @@
          * Inspect the closure of the listener
          * so that we can get information about the static arguments used.
          *
-         * @param  \ReflectionFunction  $reflection_function
+         * @param  ReflectionFunction  $reflection_function
          *
          * @return mixed
          */

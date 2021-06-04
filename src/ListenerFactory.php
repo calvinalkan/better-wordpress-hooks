@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks;
 
     use BetterWpHooks\Contracts\AbstractListener;
@@ -8,7 +11,6 @@
     use BetterWpHooks\Exceptions\InvalidListenerException;
     use BetterWpHooks\Exceptions\ExecutionErrorHandler;
     use BetterWpHooks\Listeners\ClassListener;
-
     use BetterWpHooks\Listeners\ClosureListener;
     use BetterWpHooks\Listeners\InstanceListener;
     use Closure;
@@ -30,7 +32,7 @@
         private $container;
 
         /**
-         * @var null|\BetterWpHooks\Contracts\ErrorHandler
+         * @var null|ErrorHandler
          */
         private $error_handler;
 

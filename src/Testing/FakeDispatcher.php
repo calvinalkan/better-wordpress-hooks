@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks\Testing;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Testing;
 	
 	use BetterWpHooks\Contracts\Dispatcher;
 	use Closure;
@@ -8,8 +12,9 @@
 	use Illuminate\Support\Collection;
 	use Illuminate\Support\Traits\ReflectsClosures;
 	use PHPUnit\Framework\Assert as PHPUnit;
-	
-	class FakeDispatcher implements Dispatcher {
+    use ReflectionException;
+
+    class FakeDispatcher implements Dispatcher {
 		
 		use ReflectsClosures;
 		
@@ -67,16 +72,17 @@
 			}
 			
 		}
-		
 
-		/**
-		 * Assert if an event was dispatched based on a truth-test callback.
-		 *
-		 * @param  string|\Closure    $event
-		 * @param  callable|int|null  $callback
-		 *
-		 * @return void
-		 */
+
+        /**
+         * Assert if an event was dispatched based on a truth-test callback.
+         *
+         * @param  string|Closure  $event
+         * @param  callable|int|null  $callback
+         *
+         * @return void
+         * @throws ReflectionException
+         */
 		public function assertDispatched( $event, $callback = NULL ) {
 			
 			if ( $event instanceof Closure ) {
@@ -115,15 +121,16 @@
 			);
 			
 		}
-		
-		/**
-		 * Determine if an event was dispatched based on a truth-test callback.
-		 *
-		 * @param  string|\Closure  $event
-		 * @param  callable|null    $callback
-		 *
-		 * @return void
-		 */
+
+        /**
+         * Determine if an event was dispatched based on a truth-test callback.
+         *
+         * @param  string|Closure  $event
+         * @param  callable|null  $callback
+         *
+         * @return void
+         * @throws ReflectionException
+         */
 		public function assertNotDispatched( $event, $callback = NULL ) {
 			
 			if ( $event instanceof Closure ) {

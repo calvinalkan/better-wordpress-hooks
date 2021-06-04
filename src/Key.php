@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks;
 	
 	use Closure;
 	use Illuminate\Support\Arr;
@@ -36,7 +40,7 @@
 		 * because we need access to the object_hash of the wrapping closure.
 		 *
 		 *
-		 * @param  \Closure  $callable
+		 * @param  Closure  $callable
 		 * @param            $key
 		 *
 		 * @return string

@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks\Traits;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Traits;
 	
 	/**
 	 * @codeCoverageIgnore

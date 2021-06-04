@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks\Exceptions;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Exceptions;
 	
 	use BetterWpHooks\Contracts\ErrorHandler;
 	use Illuminate\Contracts\Container\BindingResolutionException;

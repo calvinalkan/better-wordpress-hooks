@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks\Mappers;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Mappers;
 	
 	use BetterWpHooks\Contracts\Dispatcher;
     use BetterWpHooks\Contracts\EventMapper;

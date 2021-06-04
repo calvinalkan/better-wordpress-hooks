@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks\Traits;
 
     use BetterWpHooks\BetterWpHooks;

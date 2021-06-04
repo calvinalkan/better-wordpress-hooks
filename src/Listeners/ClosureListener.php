@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks\Listeners;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Listeners;
 	
 	use BetterWpHooks\Contracts\AbstractListener;
 	use Contracts\ContainerAdapter;
@@ -15,7 +19,7 @@
 		private  $closure;
 		
 		/**
-		 * @var \Contracts\ContainerAdapter
+		 * @var ContainerAdapter
 		 */
 		private  $container;
 		

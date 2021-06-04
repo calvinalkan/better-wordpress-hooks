@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks\Testing;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Testing;
 	
 	use PHPUnit\Framework\TestCase;
 	

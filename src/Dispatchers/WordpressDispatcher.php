@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks\Dispatchers;
 
     use BetterWpHooks\Alias;

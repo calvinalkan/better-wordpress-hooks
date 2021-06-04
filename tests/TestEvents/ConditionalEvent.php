@@ -1,6 +1,10 @@
 <?php
-	
-	namespace Tests\TestEvents;
+
+
+    declare(strict_types = 1);
+
+
+    namespace Tests\TestEvents;
 	
 	use BetterWpHooks\Traits\DispatchesConditionally;
 	

@@ -1,6 +1,10 @@
 <?php
-	
-	namespace Tests\Exceptions;
+
+
+    declare(strict_types = 1);
+
+
+    namespace Tests\Exceptions;
 	
 	use BetterWpHooks\Exceptions\TestException;
 	use Illuminate\Support\Arr;

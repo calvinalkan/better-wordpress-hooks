@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks;
 	
 	use Closure;
 	
