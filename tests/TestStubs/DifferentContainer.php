@@ -1,6 +1,10 @@
 <?php
-	
-	namespace Tests\TestStubs;
+
+
+    declare(strict_types = 1);
+
+
+    namespace Tests\TestStubs;
 	
 	use Closure;
     use Contracts\ContainerAdapter;

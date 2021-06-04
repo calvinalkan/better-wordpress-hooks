@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks\Functions {
 
         use Closure;
@@ -78,7 +81,6 @@
         function normalizeClassMethod($callback, $default = null)
         {
 
-
             $first_element = Arr::first($callback);
 
             if (is_string($first_element) && Str::contains($first_element, '@')) {
@@ -100,7 +102,7 @@
          * Inspect the closure of the listener
          * so that we can get information about the static arguments used.
          *
-         * @param  \ReflectionFunction  $reflection_function
+         * @param  ReflectionFunction  $reflection_function
          *
          * @return mixed
          */

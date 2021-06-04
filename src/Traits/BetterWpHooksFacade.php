@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks\Traits;
 
     use BetterWpHooks\BetterWpHooks;
@@ -9,6 +12,7 @@
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\ListenerFactory;
     use BetterWpHooks\Mappers\WordpressEventMapper;
+    use BetterWpHooks\Mixin;
     use BetterWpHooks\Testing\FakeDispatcher;
     use BetterWpHooks\WordpressApi;
     use Contracts\ContainerAdapter;
@@ -20,13 +24,12 @@
     /**
      * Trait BetterWpHooksFacade
      *
-     * @mixin \BetterWpHooks\Mixin
-     * @see \BetterWpHooks\Mixin for the public api provided.
+     * @mixin Mixin
+     * @see Mixin for the public api provided.
      */
     trait BetterWpHooksFacade
     {
 
-        use ReflectsCallable;
 
         /**
          * @var null|BetterWpHooks

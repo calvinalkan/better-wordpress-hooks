@@ -1,6 +1,10 @@
 <?php
-	
-	namespace Tests\TestDependencies;
+
+
+    declare(strict_types = 1);
+
+
+    namespace Tests\TestDependencies;
 	
 	use Tests\TestEvents\FilterableEvent;
 	
@@ -8,7 +12,7 @@
 		
 		
 		/**
-		 * @var \Tests\TestDependencies\ComplexConstructorDependency
+		 * @var ComplexConstructorDependency
 		 */
 		private  $complex_constructor_dependency;
 		

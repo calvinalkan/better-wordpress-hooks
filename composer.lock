@@ -4,8 +4,56 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ddb1c9b2d60ecc4c99e4521acb0d34d",
+    "content-hash": "3661467818c852a0655e3dfe3efd44cb",
     "packages": [
+        {
+            "name": "calvin/reflection-payload",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/calvinalkan/reflection-payload.git",
+                "reference": "565be01ecd7fdbf7e712da5ca292506e386f4e80"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/calvinalkan/reflection-payload/zipball/565be01ecd7fdbf7e712da5ca292506e386f4e80",
+                "reference": "565be01ecd7fdbf7e712da5ca292506e386f4e80",
+                "shasum": ""
+            },
+            "require": {
+                "calvinalkan/base-container": "^0.1.0",
+                "illuminate/collections": "^8.35.1",
+                "php": "^7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ReflectionPayload\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "calvinalkan",
+                    "email": "calvin@snicco.de"
+                }
+            ],
+            "description": "description",
+            "support": {
+                "issues": "https://github.com/calvinalkan/reflection-payload/issues",
+                "source": "https://github.com/calvinalkan/reflection-payload/tree/1.0.0"
+            },
+            "time": "2021-06-04T23:20:18+00:00"
+        },
         {
             "name": "calvinalkan/base-container",
             "version": "0.1.5",

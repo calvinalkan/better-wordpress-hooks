@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks;
 
     use BetterWpHooks\Contracts\EventMapper;
@@ -8,7 +11,6 @@
     use BetterWpHooks\Dispatchers\WordpressDispatcher;
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\Mappers\WordpressEventMapper;
-    use BetterWpHooks\Traits\ReflectsCallable;
     use Contracts\ContainerAdapter;
 
     class BetterWpHooks

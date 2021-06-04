@@ -1,6 +1,10 @@
 <?php
-	
-	namespace BetterWpHooks\Contracts;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Contracts;
 	
 	/**
 	 * Interface ErrorHandler

@@ -1,6 +1,10 @@
 <?php
-	
-	namespace Tests\TestListeners;
+
+
+    declare(strict_types = 1);
+
+
+    namespace Tests\TestListeners;
 	
 	use Tests\TestDependencies\SimpleMethodDependency;
 	use Tests\TestEvents\ConditionalEvent;
@@ -36,9 +40,9 @@
 			
 		}
 		
-		public function methodWithDependency( Dependency $dependency ) {
-			
-			
+		public function methodWithDependency( Dependency $dependency, $foo, $bar ) {
+
+
 		}
 		
 		public function foobarbiz( string $foo, string $bar, string $biz, SimpleMethodDependency $dependency ) {

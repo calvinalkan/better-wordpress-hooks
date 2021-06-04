@@ -1,6 +1,10 @@
 <?php
-	
-	namespace Tests\TestListeners;
+
+
+    declare(strict_types = 1);
+
+
+    namespace Tests\TestListeners;
 	
 	use Tests\TestEvents\FilterableEvent;
 	

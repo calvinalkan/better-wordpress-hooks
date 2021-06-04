@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks;
 
     use BetterWpHooks\Contracts\AbstractListener;
@@ -8,10 +11,8 @@
     use BetterWpHooks\Exceptions\InvalidListenerException;
     use BetterWpHooks\Exceptions\ExecutionErrorHandler;
     use BetterWpHooks\Listeners\ClassListener;
-
     use BetterWpHooks\Listeners\ClosureListener;
     use BetterWpHooks\Listeners\InstanceListener;
-    use BetterWpHooks\Traits\ReflectsCallable;
     use Closure;
     use Contracts\ContainerAdapter;
     use Illuminate\Support\Arr;
@@ -27,15 +28,13 @@
     class ListenerFactory
     {
 
-        use ReflectsCallable;
 
         private $container;
 
         /**
-         * @var null|\BetterWpHooks\Contracts\ErrorHandler
+         * @var null|ErrorHandler
          */
         private $error_handler;
-
 
         public function __construct(ContainerAdapter $container = null, ErrorHandler $error_handler = null)
         {
@@ -88,7 +87,6 @@
 
 
         }
-
 
         /**
          *

@@ -1,12 +1,16 @@
 <?php
-	
-	namespace Tests\TestDependencies;
+
+
+    declare(strict_types = 1);
+
+
+    namespace Tests\TestDependencies;
 	
 	class ComplexMethodDependency {
 		
 		
 		/**
-		 * @var \Tests\TestDependencies\SimpleMethodDependency
+		 * @var SimpleMethodDependency
 		 */
 		private  $simple_dependency;
 		

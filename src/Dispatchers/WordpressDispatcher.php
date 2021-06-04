@@ -1,6 +1,9 @@
 <?php
 
 
+    declare(strict_types = 1);
+
+
     namespace BetterWpHooks\Dispatchers;
 
     use BetterWpHooks\Alias;
@@ -16,7 +19,6 @@
     use Exception;
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
-
     use ReflectionException;
 
     use ReflectionMethod;
@@ -149,7 +151,6 @@
 
 
         }
-
 
         /**
          * Dispatch an event and call all the listeners.

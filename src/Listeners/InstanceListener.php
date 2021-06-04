@@ -1,22 +1,25 @@
 <?php
-	
-	namespace BetterWpHooks\Listeners;
+
+
+    declare(strict_types = 1);
+
+
+    namespace BetterWpHooks\Listeners;
 	
 	use BetterWpHooks\Contracts\AbstractListener;
-	use BetterWpHooks\Traits\ReflectsCallable;
 	use Contracts\ContainerAdapter;
-	
-	class InstanceListener extends AbstractListener {
+    use ReflectionPayload\ReflectionPayload;
+
+    class InstanceListener extends AbstractListener {
 		
-		use ReflectsCallable;
-		
+
 		/**
 		 * @var array
 		 */
 		private $instance;
 		
 		/**
-		 * @var \Contracts\ContainerAdapter
+		 * @var ContainerAdapter
 		 */
 		private $container;
 		
@@ -30,9 +33,13 @@
 		private function callInstanceMethod( $payload, $method = NULL ) {
 			
 			$method = $method ?? $this->instance[1] ?? 'handleEvent';
-			
-			return $this->container->call( $cb = [ $this->instance[0], $method ], $this->buildParameterNames($cb, $payload)
-			
+
+			$payload = new ReflectionPayload([$this->instance[0], $method], $payload);
+			$payload = $payload->build();
+
+			return $this->container->call(
+			    [ $this->instance[0], $method ],
+                $payload
 			);
 			
 		}
