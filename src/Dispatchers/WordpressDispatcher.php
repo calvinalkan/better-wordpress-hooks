@@ -181,6 +181,7 @@
 
             $filtered = $this->hook_api->applyFilter( $event, $payload );
 
+
             if ( $filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered) ) {
 
                 return $this->determineDefault($payload, $filtered);

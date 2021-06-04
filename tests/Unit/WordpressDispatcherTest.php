@@ -1191,21 +1191,32 @@
 
             $closure1 = function (ActionEvent $event_object) use ($event) {
 
+                $GLOBALS['test']['closure1'] = true;
+
+
                 $this->assertSame($event_object, $event);
 
             };
 
             $closure2 = function (ActionEvent $event_object) use ($event) {
 
+                $GLOBALS['test']['closure2'] = true;
+
                 $this->assertSame($event_object, $event);
 
 
             };
 
+            $GLOBALS['test']['closure1'] = false;
+            $GLOBALS['test']['closure2'] = false;
+
             $this->dispatcher->listen(ActionEvent::class, $closure1);
             $this->dispatcher->listen(ActionEvent::class, $closure2);
 
             $this->dispatcher->dispatch( $event );
+
+            $this->assertTrue($GLOBALS['test']['closure1']);
+            $this->assertTrue($GLOBALS['test']['closure2']);
 
         }
 

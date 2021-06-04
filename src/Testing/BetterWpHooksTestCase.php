@@ -29,6 +29,7 @@
             $GLOBALS['wp_filter']         = [];
             $GLOBALS['wp_actions']        = [];
             $GLOBALS['wp_current_filter'] = [];
+            $GLOBALS['test'] = [];
 
 			
 		}
