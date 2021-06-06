@@ -150,9 +150,9 @@
 
                     }
 
-                    foreach ($mapped_events as $key => $mapped_event) {
+                    foreach ($mapped_events as $mapped_event) {
 
-                        $this->event_mapper->listen($hook_name, $mapped_event);
+                        $this->event_mapper->map($hook_name, $mapped_event);
 
 
                     }

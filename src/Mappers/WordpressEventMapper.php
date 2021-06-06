@@ -8,6 +8,7 @@
 	
 	use BetterWpHooks\Contracts\Dispatcher;
     use BetterWpHooks\Contracts\EventMapper;
+    use BetterWpHooks\Dispatchers\WordpressDispatcher;
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\Traits\IsAction;
     use BetterWpHooks\WordpressApi;
@@ -21,8 +22,6 @@
     class WordpressEventMapper implements EventMapper {
 
 
-        const resolve_key = 'resolve';
-
         /**
 		 * @var WordpressApi
 		 */
@@ -34,7 +33,7 @@
         private $container;
 
         /**
-         * @var Dispatcher
+         * @var WordpressDispatcher
          */
         private $dispatcher;
 
@@ -56,49 +55,26 @@
          *
          * @throws ConfigurationException
          */
-		public function listen( string $hook_name, $event, int $priority = 10 ) {
+		public function map( string $hook_name, $event, int $priority = 10 ) {
 
             $event = $this->normalize($event);
 
-            if ( $resolve_from_container = $event[0] === self::resolve_key ) {
-
-                array_shift($event);
-
-            }
-
-            if ( isset( $this->mapped_events[$hook_name ] ) ) {
+            if ( isset( $this->mapped_events[ $hook_name ] )) {
 
                 $this->checkHookCompatibility($hook_name, $event[0]);
 
             }
 
             $priority = $event[1] ?? $priority;
-			
-			$callable = $this->makeCallable( $event[0] , $resolve_from_container );
 
-			$this->wp_api->addFilter($hook_name, $callable, $priority);
+			$this->wp_api->addFilter(
+			    $hook_name,
+                $this->buildResolvableForMappedEvent($event[0]),
+                $priority
+            );
 			
 			$this->mapped_events[$hook_name][] = $event[0];
 
-		}
-
-        /**
-         * @param  string  $event
-         * @param  bool  $from_container
-         *
-         * @return Closure|array|
-         */
-		private function makeCallable( string $event, bool $from_container = false  ) {
-
-		    if ( ! $from_container ) {
-
-		        return [ $event, 'mapEvent'];
-
-            }
-
-		    return $this->buildResolvableForMappedEvent($event);
-
-			
 		}
 
         private function buildResolvableForMappedEvent(string $event) : Closure

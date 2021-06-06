@@ -242,8 +242,6 @@
             Plugin1::boot();
 
 
-
-
         }
 
         /** @test */
@@ -263,7 +261,6 @@
 
 
         }
-
 
         /**
          * @test
@@ -307,23 +304,23 @@
         public function wordpress_and_plugin_hooks_can_be_mapped_to_custom_events()
         {
 
+            $GLOBALS['test']['init'] = 'NOT_RUN';
+            $GLOBALS['test']['admin_init'] = 'NOT_RUN';
+            $GLOBALS['test']['other_admin_init'] = 'NOT_RUN';
 
             $this->newPlugin1();
-
-            self::assertFalse(has_filter('init', [ActionListener::class, 'mapEvent']));
-            self::assertFalse(has_filter('admin_init', [ActionListener::class, 'mapEvent']));
 
             Plugin1::map([
 
                 'init' => [
 
-                    ActionListener::class,
+                    ActionEvent::class,
 
                 ],
 
                 'admin_init' => [
 
-                    [ActionListener::class, 20],
+                    [EventFakeStub::class, 20],
 
                 ],
 
@@ -331,12 +328,32 @@
 
             Plugin1::boot();
 
-            self::assertEquals(self::default_priority, has_filter('init', [
-                ActionListener::class, 'mapEvent',
-            ]));
-            self::assertEquals(20, has_filter('admin_init', [ActionListener::class, 'mapEvent']));
+            Plugin1::listen(ActionEvent::class, function () {
 
-            self::assertEquals(99, $GLOBALS['wp_filter']['init']->callbacks[10]['Tests\TestListeners\ActionListener::mapEvent']['accepted_args']);
+                $GLOBALS['test']['init'] = 'RUN';
+
+            });
+
+            Plugin1::listen(EventFakeStub::class, function () {
+
+                $this->assertSame('NOT_RUN', $GLOBALS['test']['other_admin_init']);
+                $GLOBALS['test']['admin_init'] = 'RUN';
+
+            });
+
+            add_action(EventFakeStub::class, function () {
+
+                $this->assertSame('RUN', $GLOBALS['test']['admin_init']);
+                $GLOBALS['test']['other_admin_init'] = 'RUN';
+
+            }, 19);
+
+            do_action('init');
+            $this->assertSame('RUN',$GLOBALS['test']['init']);
+
+            do_action('admin_init');
+            $this->assertSame('RUN',$GLOBALS['test']['admin_init']);
+            $this->assertSame('RUN',$GLOBALS['test']['other_admin_init']);
 
 
         }
@@ -378,14 +395,18 @@
         }
 
         /** @test */
-        public function if_specified_mapped_events_can_be_resolved_from_the_container()
+        public function mapped_events_can_be_resolved_from_the_container()
         {
 
             $this->newPlugin1();
 
             Plugin1::map([
 
-                'init' => [['resolve', EventWithDependency::class]],
+                'init' => [
+
+                    EventWithDependency::class,
+
+                ],
 
             ]);
 
@@ -415,10 +436,9 @@
                 'init' => [
 
                     [ActionEvent::class],
-                    ['resolve', ActionEvent2::class],
+                    [ActionEvent2::class],
 
                 ],
-
 
             ]);
 
@@ -445,7 +465,8 @@
         }
 
         /** @test */
-        public function an_exception_gets_thrown_if_more_than_one_event_is_mapped_for_a_WP_FILTER () {
+        public function an_exception_gets_thrown_if_more_than_one_event_is_mapped_for_a_WP_FILTER()
+        {
 
 
             $this->newPlugin1();
@@ -458,7 +479,6 @@
                     ActionEvent::class,
 
                 ],
-
 
             ]);
 
@@ -478,7 +498,6 @@
 
                 ],
 
-
             ]);
 
             $this->expectException(ConfigurationException::class);
@@ -490,7 +509,8 @@
         }
 
         /** @test */
-        public function events_can_be_mapped_to_always_fire_first () {
+        public function events_can_be_mapped_to_always_fire_first()
+        {
 
 
             $GLOBALS['test']['other_hook'] = 'not-run';
@@ -504,7 +524,7 @@
                 'init' => [
                     ActionEvent::class,
                     EventFakeStub::class,
-                ]
+                ],
 
             ]);
 
@@ -544,7 +564,8 @@
         }
 
         /** @test */
-        public function events_can_be_mapped_to_always_last () {
+        public function events_can_be_mapped_to_always_last()
+        {
 
 
             $GLOBALS['test']['other_hook'] = 'not-run';
@@ -558,7 +579,7 @@
                 'init' => [
                     ActionEvent::class,
                     EventFakeStub::class,
-                ]
+                ],
 
             ]);
 
@@ -1463,7 +1484,9 @@
 
             Plugin1::map([
 
-                'checkout_price' => [['resolve', EventWithDependencyAndWpParams::class]]
+                'checkout_price' => [
+                    EventWithDependencyAndWpParams::class,
+                ],
 
             ]);
 
