@@ -7,7 +7,9 @@
     namespace Tests\TestEvents;
 	
 	
-	class FilterableEvent {
+	use Tests\TestStubs\Plugin1;
+
+    class FilterableEvent extends Plugin1 {
 		
 		
 		public  $foo;

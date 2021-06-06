@@ -16,6 +16,8 @@
     use SniccoAdapter\BaseContainerAdapter;
     use Tests\Exceptions\DidAction;
     use Tests\TestDependencies\SimpleClass;
+    use Tests\TestEvents\ActionEvent;
+    use Tests\TestEvents\ActionEvent2;
     use Tests\TestListeners\ActionListener;
     use Tests\TestEvents\FilterableEvent;
     use Tests\TestStubs\DifferentContainer;
@@ -31,6 +33,7 @@
 
         protected function setUp() : void
         {
+
             parent::setUp();
 
             $this->setUpWp(VENDOR_DIR);
@@ -234,12 +237,10 @@
 
             Plugin1::map(['invalid']);
 
-            $this->assertThrowsWithMessage(ConfigurationException::class,
-                'invalid data was provided for event-mapping: no hook provided for event.', function () {
+            $this->expectException(ConfigurationException::class);
+            Plugin1::boot();
 
-                    Plugin1::boot();
 
-                });
 
 
         }
@@ -265,8 +266,6 @@
 
         /**
          * @test
-         *
-         * @noinspection PhpUndefinedMethodInspection
          */
         public function an_exception_gets_thrown_when_an_undefined_static_method_is_called()
         {
@@ -385,7 +384,7 @@
 
             Plugin1::map([
 
-                'init' => ['resolve', EventWithDependency::class],
+                'init' => [['resolve', EventWithDependency::class]],
 
             ]);
 
@@ -401,6 +400,93 @@
 
         }
 
+        /** @test */
+        public function one_core_wordpress_ACTION_hook_can_be_mapped_to_many_custom_events()
+        {
+
+            $this->newPlugin1();
+
+            $GLOBALS['test'][ActionEvent::class] = 'not-fired';
+            $GLOBALS['test'][ActionEvent2::class] = 'not-fired';
+
+            Plugin1::map([
+
+                'init' => [
+
+                    [ActionEvent::class],
+                    ['resolve', ActionEvent2::class],
+
+                ],
+
+
+            ]);
+
+            Plugin1::boot();
+
+            Plugin1::listen(ActionEvent::class, function (ActionEvent $event) {
+
+                $GLOBALS['test'][ActionEvent::class] = 'fired';
+
+            });
+
+            Plugin1::listen(ActionEvent2::class, function (ActionEvent2 $event) {
+
+                $GLOBALS['test'][ActionEvent2::class] = 'fired';
+
+
+            });
+
+            do_action('init');
+
+            $this->assertSame('fired', $GLOBALS['test'][ActionEvent::class], 'first mapped event not fired.');
+            $this->assertSame('fired', $GLOBALS['test'][ActionEvent2::class], 'second mapped event not fired.');
+
+        }
+
+        /** @test */
+        public function an_exception_gets_thrown_if_more_than_one_event_is_mapped_for_a_WP_FILTER () {
+
+
+            $this->newPlugin1();
+
+            Plugin1::map([
+
+                'init' => [
+
+                    FilterableEvent::class,
+                    ActionEvent::class,
+
+                ],
+
+
+            ]);
+
+            $this->expectException(ConfigurationException::class);
+            $this->expectExceptionMessage('WP filter');
+
+            Plugin1::boot();
+
+            $this->reset();
+
+            Plugin1::map([
+
+                'init' => [
+
+                    ActionEvent::class,
+                    FilterableEvent::class,
+
+                ],
+
+
+            ]);
+
+            $this->expectException(ConfigurationException::class);
+            $this->expectExceptionMessage('not an action');
+
+            Plugin1::boot();
+
+
+        }
 
 
         /**
@@ -917,7 +1003,6 @@
             );
 
 
-
         }
 
         /** @test */
@@ -1261,14 +1346,15 @@
         }
 
         /** @test */
-        public function an_event_with_several_wp_params_and_constructor_dependencies_gets_resolved_from_the_container_if_specified () {
+        public function an_event_with_several_wp_params_and_constructor_dependencies_gets_resolved_from_the_container_if_specified()
+        {
 
 
             $this->newPlugin1();
 
             Plugin1::map([
 
-                'checkout_price' => [ 'resolve' , EventWithDependencyAndWpParams::class],
+                'checkout_price' => [['resolve', EventWithDependencyAndWpParams::class]]
 
             ]);
 
@@ -1278,7 +1364,7 @@
 
                     function (EventWithDependencyAndWpParams $event) {
 
-                       return $event->label . $event->currency;
+                        return $event->label.$event->currency;
 
                     },
 
@@ -1361,6 +1447,7 @@
 
     }
 
+
     class EventWithDependency extends Plugin1
     {
 
@@ -1369,7 +1456,7 @@
          */
         public $class;
 
-        public function __construct(string $unimportant_wp_arg , SimpleClass $class)
+        public function __construct(string $unimportant_wp_arg, SimpleClass $class)
         {
 
             $this->class = $class;
@@ -1378,24 +1465,25 @@
 
     }
 
+
     class EventWithDependencyAndWpParams extends Plugin1
     {
-
 
 
         public $label;
         public $currency;
 
-        public function __construct(string $label, string $currency, SimpleClass $class )
+        public function __construct(string $label, string $currency, SimpleClass $class)
         {
 
-            $this->label = $label . ':' . trim($class->message);
+            $this->label = $label.':'.trim($class->message);
             $this->currency = '€';
 
         }
 
 
     }
+
 
     class EventNoParams extends Plugin1
     {
@@ -1411,6 +1499,7 @@
 
 
     }
+
 
     class Filterable extends Plugin1
     {
@@ -1435,11 +1524,13 @@
 
     }
 
+
     class WpLoaded extends Plugin1
     {
 
 
     }
+
 
     class CurrentScreen extends Plugin1
     {
@@ -1458,6 +1549,7 @@
 
     }
 
+
     class ArrayAction extends Plugin1
     {
 
@@ -1471,6 +1563,7 @@
         }
 
     }
+
 
     class BlogTitle extends Plugin1
     {
@@ -1494,6 +1587,7 @@
 
 
     }
+
 
     class CheckoutPrice extends Plugin1
     {
@@ -1519,6 +1613,7 @@
         }
 
     }
+
 
     class AdminUsers extends Plugin1
     {

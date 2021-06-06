@@ -119,7 +119,7 @@
 
             try {
 
-                foreach ($this->mapped_events as $hook_name => $mapped_event) {
+                foreach ($this->mapped_events as $hook_name => $mapped_events) {
 
                     if ( ! $hook_name) {
 
@@ -127,7 +127,13 @@
 
                     }
 
-                    $this->event_mapper->listen($hook_name, $mapped_event);
+                    foreach ($mapped_events as $mapped_event) {
+
+                        $this->event_mapper->listen($hook_name, $mapped_event);
+
+
+                    }
+
 
 
                 }
@@ -135,7 +141,7 @@
             }
             catch (\Throwable $e) {
 
-                throw new ConfigurationException('Invalid Data was provided for event-mapping: '.$e->getMessage());
+                throw new ConfigurationException('Invalid Data was provided for event-mapping:' . PHP_EOL .$e->getMessage());
 
             }
 
