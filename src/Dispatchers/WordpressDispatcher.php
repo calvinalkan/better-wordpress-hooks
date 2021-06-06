@@ -12,6 +12,7 @@
     use BetterWpHooks\Exceptions\UnremovableListenerException;
     use BetterWpHooks\Key;
     use BetterWpHooks\ListenerFactory;
+    use BetterWpHooks\Listeners\ContainedListener;
     use BetterWpHooks\Traits\DispatchesConditionally;
     use BetterWpHooks\Traits\StopsPropagation;
     use BetterWpHooks\WordpressApi;
@@ -20,7 +21,6 @@
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
     use ReflectionException;
-
     use ReflectionMethod;
 
     use function BetterWpHooks\Functions\arrayFirst;
@@ -51,7 +51,6 @@
             $this->hook_api = $hook_api ?? new WordpressApi();
 
         }
-
 
         /**
          * @param  string  $eventName
@@ -119,8 +118,10 @@
         /**
          * @param  string  $event
          * @param  string|array|Closure|callable|object  $callable
+         * @param  int  $priority
          *
          * @return Closure
+         * @throws DuplicateListenerException
          * @throws ReflectionException
          * @api
          *
@@ -129,13 +130,7 @@
         public function listen(string $event, $callable, int $priority = 10) : Closure
         {
 
-            $callable = Arr::wrap($callable);
-
-            if (is_array(arrayFirst($callable))) {
-
-                $callable = [$key = array_key_first($callable) => normalizeClassMethod($callable[$key])];
-
-            }
+            $callable = $this->normalizeCallable($callable);
 
             $this->hook_api->addFilter(
 
@@ -149,6 +144,85 @@
 
             return $callable;
 
+
+        }
+
+        /**
+         *
+         * Create a listener that will always run first no matter what other hooks are
+         * registered with WordPress.
+         *
+         * @param  string  $event
+         * @param  callable  $callable
+         * @param  bool  $unremovable
+         *
+         * @throws DuplicateListenerException
+         * @throws ReflectionException
+         *
+         * @api
+         *
+         */
+        public function ensureFirst(string $event, callable $callable, bool $unremovable = true)
+        {
+
+           $this->createContainedHook($event, $callable, $unremovable, 'first');
+
+        }
+
+        /**
+         *
+         * Create a listener that will always run last no matter what other hooks are
+         * registered with WordPress.
+         *
+         * @param  string  $event
+         * @param  callable  $callable
+         * @param  bool  $unremovable
+         *
+         * @throws DuplicateListenerException
+         * @throws ReflectionException
+         *
+         * @api
+         *
+         */
+        public function ensureLast(string $event, callable $callable, bool $unremovable = true)
+        {
+
+            $this->createContainedHook($event, $callable, $unremovable, 'last');
+
+        }
+
+        /**
+         * @throws ReflectionException
+         * @throws DuplicateListenerException
+         */
+        private function createContainedHook($event, $callable, bool $unremovable, string $order = 'last') {
+
+            $callable = $this->normalizeCallable($callable);
+
+            $listener = $this->createListener($event, array_key_first($callable), $callable);
+
+            $contained_hook = new ContainedListener( $event,$listener, $this->hook_api );
+
+            $order = ( $order === 'last') ? 'last' : 'first';
+
+            if ($order === 'first') {
+
+                $contained_hook->registerFirst();
+
+            }
+
+             if ($order === 'last') {
+
+                $contained_hook->registerLast();
+
+            }
+
+            if ( $unremovable ) {
+
+                $this->unremovable[] = spl_object_hash($listener);
+                $this->unremovable[] = spl_object_hash($contained_hook);
+
+            }
 
         }
 
@@ -172,20 +246,21 @@
                 return;
             }
 
-            [$event, $payload, $original_event_object ] = $this->parseEventAndPayload($event, $payload);
+            [
+                $event, $payload, $original_event_object,
+            ] = $this->parseEventAndPayload($event, $payload);
 
             $this->maybeStopPropagation($event);
 
-            if ( ! $this->hasListeners( $event ) ) {
+            if ( ! $this->hasListeners($event)) {
 
                 return $this->determineDefault($payload, null, $original_event_object);
 
             }
 
-            $filtered = $this->hook_api->applyFilter( $event, $payload );
+            $filtered = $this->hook_api->applyFilter($event, $payload);
 
-
-            if ( $filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered, $original_event_object) ) {
+            if ($filtered === $payload || ! $this->isCorrectReturnValue($payload, $filtered, $original_event_object)) {
 
                 return $this->determineDefault($payload, $filtered, $original_event_object);
 
@@ -195,7 +270,6 @@
 
 
         }
-
 
         /**
          *
@@ -243,6 +317,21 @@
             $closure = $this->listen($event, $callable);
 
             $this->unremovable[] = spl_object_hash($closure);
+
+        }
+
+        private function normalizeCallable($callable) : array
+        {
+
+            $callable = Arr::wrap($callable);
+
+            if (is_array(arrayFirst($callable))) {
+
+                $callable = [$key = array_key_first($callable) => normalizeClassMethod($callable[$key])];
+
+            }
+
+            return $callable;
 
         }
 
@@ -453,11 +542,12 @@
 
         private function isCorrectReturnValue($payload, $filtered, ?object $original_event_object) : bool
         {
+
             $event_object = is_object($payload)
                 ? $payload
                 : $original_event_object;
 
-            if ( $event_object === null ) {
+            if ($event_object === null) {
                 return true;
             }
 
@@ -490,7 +580,7 @@
 
             }
 
-            if ( $original_event_object && is_callable([$original_event_object, 'default'] ) ) {
+            if ($original_event_object && is_callable([$original_event_object, 'default'])) {
 
                 return $original_event_object->default($payload, $filtered);
 
@@ -512,13 +602,14 @@
          */
         private function parseEventAndPayload($event, $payload) : array
         {
+
             $original_event_object = null;
 
             if (is_object($event)) {
 
-                $payload = method_exists($event, 'payload') ? $event->payload() :$event;
+                $payload = method_exists($event, 'payload') ? $event->payload() : $event;
 
-                if ( ! is_object( $payload ) ) {
+                if ( ! is_object($payload)) {
                     $original_event_object = $event;
                 }
 
@@ -613,5 +704,7 @@
             return $key;
 
         }
+
+
 
     }
