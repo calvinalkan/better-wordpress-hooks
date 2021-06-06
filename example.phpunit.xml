@@ -20,7 +20,7 @@
         </testsuite>
     </testsuites>
     <php>
-        <env name="ROOT_DIR" value="/Users/calvinalkan/valet/wp-hooks/better-wordpress-hooks"/>
+        <env name="ROOT_DIR" value=""/>
     </php>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage"
