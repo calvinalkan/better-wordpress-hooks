@@ -83,27 +83,6 @@
         }
 
         /** @test */
-        public function a_hook_that_always_runs_first_is_not_removeable_by_default () {
-
-            $GLOBALS['test']['init_high_priority'] = 'not-run';
-            $GLOBALS['test']['ensure_first'] = 'not-run';
-
-
-            $this->dispatcher->ensureFirst('init', $c = function () {
-
-                $GLOBALS['test']['ensure_first'] = 'run';
-                $this->assertSame('not-run', $GLOBALS['test']['init_high_priority'], 'The hook was not run first.');
-
-            });
-
-            $this->expectException(UnremovableListenerException::class);
-
-            $this->dispatcher->forgetOne('init', $c);
-
-
-        }
-
-        /** @test */
         public function a_hook_that_always_runs_last_can_be_created () {
 
             $GLOBALS['test']['init_high_priority'] = 'not-run';
@@ -133,4 +112,86 @@
 
         }
 
+        /** @test */
+        public function a_hook_that_always_runs_last_is_not_removeable_by_default () {
+
+
+            $this->dispatcher->ensureLast('init', $c = function () {
+
+                //
+
+            });
+
+             $this->expectException(UnremovableListenerException::class);
+
+            $this->dispatcher->forgetOne('init', $c);
+
+
+        }
+
+        /** @test */
+        public function a_hook_that_always_runs_first_is_not_removeable_by_default () {
+
+
+            $this->dispatcher->ensureFirst('init', $c = function () {
+
+                //
+
+            });
+
+            $this->expectException(UnremovableListenerException::class);
+
+            $this->dispatcher->forgetOne('init', $c);
+
+
+        }
+
+        /** @test */
+        public function hook_existence_can_be_checked_for_contained_listeners () {
+
+            $this->dispatcher->ensureFirst('init', $c = function () {
+
+                //
+
+            } );
+
+            $this->assertTrue($this->dispatcher->hasListenerFor($c, 'init'));
+
+        }
+
+        /** @test */
+        public function a_hook_that_runs_first_can_be_marked_as_removable () {
+
+            $this->dispatcher->ensureFirst('init', $c = function () {
+
+                //
+
+            }, false );
+
+            $this->assertTrue($this->dispatcher->hasListenerFor($c, 'init'));
+
+            $this->dispatcher->forgetOne('init', $c);
+
+            $this->assertFalse($this->dispatcher->hasListenerFor($c, 'init'));
+
+
+        }
+
+        /** @test */
+        public function a_hook_that_runs_last_can_be_marked_as_removable () {
+
+            $this->dispatcher->ensureLast('init', $c = function () {
+
+                //
+
+            }, false );
+
+            $this->assertTrue($this->dispatcher->hasListenerFor($c, 'init'));
+
+            $this->dispatcher->forgetOne('init', $c);
+
+            $this->assertFalse($this->dispatcher->hasListenerFor($c, 'init'));
+
+
+        }
     }

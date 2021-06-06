@@ -46,6 +46,12 @@
             $this->hook_api = $hook_api;
         }
 
+        public function proxiesTo () {
+
+            return $this->listener;
+
+        }
+
         public function __invoke(...$args_from_wp)
         {
 

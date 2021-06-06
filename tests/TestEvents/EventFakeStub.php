@@ -6,7 +6,9 @@
 
     namespace Tests\TestEvents;
 	
-	class EventFakeStub {
+	use Tests\TestStubs\Plugin1;
+
+    class EventFakeStub extends Plugin1 {
 		
 		public $creator;
 

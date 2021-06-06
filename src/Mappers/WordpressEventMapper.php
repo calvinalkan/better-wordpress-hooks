@@ -66,7 +66,7 @@
 
             }
 
-            if ( isset($this->mapped_events[$hook_name ] ) ) {
+            if ( isset( $this->mapped_events[$hook_name ] ) ) {
 
                 $this->checkHookCompatibility($hook_name, $event[0]);
 

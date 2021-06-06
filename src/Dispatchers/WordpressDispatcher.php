@@ -43,6 +43,7 @@
 
         private $unremovable = [];
 
+        private $contained_listeners = [];
 
         public function __construct(ListenerFactory $listener_factory, WordpressApi $hook_api = null)
         {
@@ -107,11 +108,8 @@
 
             $key = $this->resolveAlias($event, $callable);
 
-            return isset($this->listeners[$event][$key])
-                && $this->hook_api->hasFilterFor(
-                    $event,
-                    $this->findClosureByAlias($event, $key)
-                );
+            return isset($this->listeners[$event][$key]);
+
 
         }
 
@@ -165,7 +163,7 @@
         public function ensureFirst(string $event, callable $callable, bool $unremovable = true)
         {
 
-           $this->createContainedHook($event, $callable, $unremovable, 'first');
+            $this->createContainedHook($event, $callable, $unremovable, 'first');
 
         }
 
@@ -195,15 +193,16 @@
          * @throws ReflectionException
          * @throws DuplicateListenerException
          */
-        private function createContainedHook($event, $callable, bool $unremovable, string $order = 'last') {
+        private function createContainedHook($event, $callable, bool $unremovable, string $order = 'last')
+        {
 
             $callable = $this->normalizeCallable($callable);
 
             $listener = $this->createListener($event, array_key_first($callable), $callable);
 
-            $contained_hook = new ContainedListener( $event,$listener, $this->hook_api );
+            $contained_hook = new ContainedListener($event, $listener, $this->hook_api);
 
-            $order = ( $order === 'last') ? 'last' : 'first';
+            $order = ($order === 'last') ? 'last' : 'first';
 
             if ($order === 'first') {
 
@@ -211,13 +210,15 @@
 
             }
 
-             if ($order === 'last') {
+            if ($order === 'last') {
 
                 $contained_hook->registerLast();
 
             }
 
-            if ( $unremovable ) {
+            $this->contained_listeners[$event][spl_object_hash($listener)] = $listener;
+
+            if ($unremovable) {
 
                 $this->unremovable[] = spl_object_hash($listener);
                 $this->unremovable[] = spl_object_hash($contained_hook);
@@ -524,21 +525,7 @@
 
         }
 
-        /**
-         * Uses the alias of the listener to find and return
-         * the object hash of the listener callable
-         *
-         * @param $event
-         * @param $alias
-         *
-         * @return string
-         */
-        private function findClosureByAlias($event, $alias) : string
-        {
 
-            return spl_object_hash($this->listeners[$event][$alias]);
-
-        }
 
         private function isCorrectReturnValue($payload, $filtered, ?object $original_event_object) : bool
         {
@@ -704,7 +691,6 @@
             return $key;
 
         }
-
 
 
     }
