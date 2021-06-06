@@ -29,7 +29,7 @@
          *
 		 * @return mixed
 		 */
-		public function listen( string $hook_name, array $event, int $priority = 10 );
+		public function map( string $hook_name, array $event, int $priority = 10 );
 		
 		
 		
