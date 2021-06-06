@@ -7,8 +7,9 @@
     namespace Tests\TestEvents;
 
     use BetterWpHooks\Traits\IsAction;
+    use Tests\TestStubs\Plugin1;
 
-    class ActionEvent
+    class ActionEvent extends Plugin1
     {
         use IsAction;
 

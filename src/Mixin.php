@@ -70,7 +70,7 @@
         /**
          * Returns the dispatcher instance
          *
-         * @return WordpressDispatcher | FakeDispatcher
+         * @return WordpressDispatcher|FakeDispatcher
          */
         public static function dispatcher()
         {

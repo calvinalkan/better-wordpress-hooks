@@ -16,7 +16,7 @@
 
 		public function applyFilter( $event , ...$payload ) {
 
-		    if ( $this->isDispatchingAction($event) ) {
+		    if ( $this->isAction($event) ) {
 
 		        do_action($event, ...$payload);
 
@@ -54,7 +54,7 @@
 			
 		}
 
-		private function isDispatchingAction( $event ) : bool
+		public function isAction( $event ) : bool
         {
 
             if ( classExists($event) && in_array(IsAction::class, class_uses($event) ) ) {
@@ -66,5 +66,7 @@
             return false;
 
         }
+
+
 		
 	}
