@@ -11,8 +11,9 @@
 	use Tests\TestDependencies\Dependency;
 	use Tests\Exceptions\DidAction;
 	use Tests\StackInfo;
-	
-	class ActionListener {
+    use Tests\TestStubs\Plugin1;
+
+    class ActionListener  {
 		
 		use StackInfo;
 		

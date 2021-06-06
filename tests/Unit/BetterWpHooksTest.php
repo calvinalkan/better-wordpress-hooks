@@ -18,6 +18,7 @@
     use Tests\TestDependencies\SimpleClass;
     use Tests\TestEvents\ActionEvent;
     use Tests\TestEvents\ActionEvent2;
+    use Tests\TestEvents\EventFakeStub;
     use Tests\TestListeners\ActionListener;
     use Tests\TestEvents\FilterableEvent;
     use Tests\TestStubs\DifferentContainer;
@@ -484,6 +485,114 @@
             $this->expectExceptionMessage('not an action');
 
             Plugin1::boot();
+
+
+        }
+
+        /** @test */
+        public function events_can_be_mapped_to_always_fire_first () {
+
+
+            $GLOBALS['test']['other_hook'] = 'not-run';
+            $GLOBALS['test'][ActionEvent::class] = 'not-run';
+            $GLOBALS['test'][EventFakeStub::class] = 'not-run';
+
+            $this->newPlugin1();
+
+            Plugin1::ensureFirst([
+
+                'init' => [
+                    ActionEvent::class,
+                    EventFakeStub::class,
+                ]
+
+            ]);
+
+            Plugin1::boot();
+
+            add_action('init', function () {
+
+                $this->assertSame('run', $GLOBALS['test'][ActionEvent::class]);
+                $this->assertSame('run', $GLOBALS['test'][EventFakeStub::class]);
+                $GLOBALS['test']['other_hook'] = 'run';
+
+            }, PHP_INT_MIN);
+
+            Plugin1::listen(ActionEvent::class, function () {
+
+                $this->assertSame('not-run', $GLOBALS['test']['other_hook']);
+                $this->assertSame('run', $GLOBALS['test'][EventFakeStub::class]);
+                $GLOBALS['test'][ActionEvent::class] = 'run';
+
+            });
+
+            Plugin1::listen(EventFakeStub::class, function () {
+
+                $this->assertSame('not-run', $GLOBALS['test'][ActionEvent::class]);
+                $this->assertSame('not-run', $GLOBALS['test']['other_hook']);
+                $GLOBALS['test'][EventFakeStub::class] = 'run';
+
+            });
+
+            do_action('init');
+
+            $this->assertSame('run', $GLOBALS['test']['other_hook']);
+            $this->assertSame('run', $GLOBALS['test'][ActionEvent::class]);
+            $this->assertSame('run', $GLOBALS['test'][EventFakeStub::class]);
+
+
+        }
+
+        /** @test */
+        public function events_can_be_mapped_to_always_last () {
+
+
+            $GLOBALS['test']['other_hook'] = 'not-run';
+            $GLOBALS['test'][ActionEvent::class] = 'not-run';
+            $GLOBALS['test'][EventFakeStub::class] = 'not-run';
+
+            $this->newPlugin1();
+
+            Plugin1::ensureLast([
+
+                'init' => [
+                    ActionEvent::class,
+                    EventFakeStub::class,
+                ]
+
+            ]);
+
+            Plugin1::boot();
+
+            add_action('init', function () {
+
+                $this->assertSame('not-run', $GLOBALS['test'][ActionEvent::class]);
+                $this->assertSame('not-run', $GLOBALS['test'][EventFakeStub::class]);
+                $GLOBALS['test']['other_hook'] = 'run';
+
+            }, PHP_INT_MAX);
+
+            Plugin1::listen(ActionEvent::class, function () {
+
+                $this->assertSame('run', $GLOBALS['test']['other_hook']);
+                $this->assertSame('not-run', $GLOBALS['test'][EventFakeStub::class]);
+                $GLOBALS['test'][ActionEvent::class] = 'run';
+
+            });
+
+            Plugin1::listen(EventFakeStub::class, function () {
+
+                $this->assertSame('run', $GLOBALS['test'][ActionEvent::class]);
+                $this->assertSame('run', $GLOBALS['test']['other_hook']);
+                $GLOBALS['test'][EventFakeStub::class] = 'run';
+
+            });
+
+            do_action('init');
+
+            $this->assertSame('run', $GLOBALS['test']['other_hook']);
+            $this->assertSame('run', $GLOBALS['test'][ActionEvent::class]);
+            $this->assertSame('run', $GLOBALS['test'][EventFakeStub::class]);
 
 
         }
@@ -1408,7 +1517,6 @@
 
 
         }
-
 
         private function newPlugin1()
         {

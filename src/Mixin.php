@@ -7,10 +7,12 @@
     namespace BetterWpHooks;
 
     use BetterWpHooks\Dispatchers\WordpressDispatcher;
+    use BetterWpHooks\Exceptions\DuplicateListenerException;
     use BetterWpHooks\Testing\FakeDispatcher;
     use Closure;
     use Contracts\ContainerAdapter;
     use Exception;
+    use ReflectionException;
 
     /**
      * @codeCoverageIgnore
@@ -66,7 +68,6 @@
         {
         }
 
-
         /**
          * Returns the dispatcher instance
          *
@@ -75,7 +76,6 @@
         public static function dispatcher()
         {
         }
-
 
         /**
          * Register an event listener with the dispatcher.
@@ -95,11 +95,46 @@
          * can not be removed.
          *
          * @param  string  $event
-         * @param  string|array  $callable
+         * @param  string|array|Closure|callable|object  $callable
          *
          * @return void
          */
         public static function unremovable(string $event, $callable)
+        {
+        }
+
+        /**
+         *
+         * Create an event object that will always run first no matter what other hooks are
+         * registered with WordPress.
+         *
+         *  @param  array  $mapped_events A multi-dimensional array where each element has the following format
+         *
+         * 'init' => [
+         *      EventObject::class
+         * ]
+         *
+         * @return BetterWpHooks
+         */
+        public static function ensureFirst(array $mapped_events) : BetterWpHooks
+        {
+        }
+
+        /**
+         *
+         * Create an event object that will always run last no matter what other hooks are
+         * registered with WordPress.
+         *
+         * @param  array  $mapped_events A multi-dimensional array where each element has the following format
+         *
+         * 'init' => [
+         *      EventObject::class
+         * ]
+         *
+         * @return BetterWpHooks
+         *
+         */
+        public static function ensureLast(array $mapped_events) :BetterWpHooks
         {
         }
 
@@ -114,7 +149,6 @@
         {
         }
 
-
         /**
          *
          * Check if a specific listener was created through the WordpressDispatcher
@@ -128,7 +162,6 @@
         {
         }
 
-
         /** Remove one listener for a given event from the dispatcher.
          *
          * @param  string  $event
@@ -136,7 +169,7 @@
          *
          * @return void
          */
-        public static function forgetOne(string $event, $listener) :void
+        public static function forgetOne(string $event, $listener) : void
         {
         }
 
@@ -148,7 +181,7 @@
          *
          * @return void
          */
-        public static function assertDispatched($event, $callback = null) :void
+        public static function assertDispatched($event, $callback = null) : void
         {
         }
 
@@ -159,10 +192,9 @@
          * @param  int  $times
          *
          */
-        public static function assertDispatchedTimes(string $event, int $times = 1) :bool
+        public static function assertDispatchedTimes(string $event, int $times = 1) : bool
         {
         }
-
 
         /**
          * Determine if an event was dispatched based on a truth-test callback.
@@ -172,7 +204,7 @@
          *
          * @return void
          */
-        public static function assertNotDispatched($event, callable $callback = null) :void
+        public static function assertNotDispatched($event, callable $callback = null) : void
         {
 
         }
@@ -182,7 +214,7 @@
          *
          * @return void
          */
-        public static function assertNothingDispatched() :void
+        public static function assertNothingDispatched() : void
         {
 
 

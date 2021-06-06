@@ -12,6 +12,7 @@
     use BetterWpHooks\Exceptions\ConfigurationException;
     use BetterWpHooks\Mappers\WordpressEventMapper;
     use Contracts\ContainerAdapter;
+    use Throwable;
 
     class BetterWpHooks
     {
@@ -23,7 +24,7 @@
         private $container_adapter;
 
         /**
-         * @var Dispatcher
+         * @var WordpressDispatcher
          */
         private $dispatcher;
 
@@ -34,6 +35,8 @@
 
         private $listen        = [];
         private $mapped_events = [];
+        private $ensure_first  = [];
+        private $ensure_last   = [];
 
         public function __construct(
             ContainerAdapter $container_adapter, Dispatcher $dispatcher,
@@ -64,11 +67,31 @@
 
         }
 
+        public function ensureFirst(array $mapped_events) : BetterWpHooks
+        {
+
+            $this->ensure_first = $mapped_events ?? [];
+
+            return $this;
+
+        }
+
+        public function ensureLast(array $mapped_events) : BetterWpHooks
+        {
+
+            $this->ensure_last = $mapped_events ?? [];
+
+            return $this;
+
+        }
+
         public function boot()
         {
 
 
             $this->mapEvents();
+            $this->mapEnsureFirst();
+            $this->mapEnsureLast();
             $this->registerListeners();
 
 
@@ -93,7 +116,7 @@
 
             $this->dispatcher = $new_dispatcher;
 
-            if ( ! $swap_in_container ) {
+            if ( ! $swap_in_container) {
 
                 return;
 
@@ -127,7 +150,7 @@
 
                     }
 
-                    foreach ($mapped_events as $mapped_event) {
+                    foreach ($mapped_events as $key => $mapped_event) {
 
                         $this->event_mapper->listen($hook_name, $mapped_event);
 
@@ -135,13 +158,12 @@
                     }
 
 
-
                 }
 
             }
-            catch (\Throwable $e) {
+            catch (Throwable $e) {
 
-                throw new ConfigurationException('Invalid Data was provided for event-mapping:' . PHP_EOL .$e->getMessage());
+                throw new ConfigurationException('Invalid Data was provided for event-mapping:'.PHP_EOL.$e->getMessage());
 
             }
 
@@ -166,12 +188,45 @@
 
             }
 
-            catch (\Throwable $e) {
+            catch (Throwable $e) {
 
                 throw new ConfigurationException('Invalid Data was provided for a listener: '.$e->getMessage());
 
             }
 
+
+        }
+
+        private function mapEnsureFirst()
+        {
+
+            foreach ($this->ensure_first as $hook => $event_objects ) {
+
+                foreach ($event_objects as $event_object) {
+
+                    $this->dispatcher->ensureFirst($hook, [$event_object, 'mapEvent'], true);
+
+                }
+
+
+            }
+
+
+        }
+
+        private function mapEnsureLast()
+        {
+
+            foreach ($this->ensure_last as $hook => $event_objects ) {
+
+                foreach ($event_objects as $event_object) {
+
+                    $this->dispatcher->ensureLast($hook, [$event_object, 'mapEvent'], true);
+
+                }
+
+
+            }
 
         }
 
