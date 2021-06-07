@@ -99,7 +99,7 @@
 
         }
 
-        public function reorderAtRuntime()
+        public function reorderAtRuntime(...$args_from_wp)
         {
 
             $hook = $this->getCurrentHookObject();
@@ -123,6 +123,8 @@
                 [$this, '__invoke'],
                 $priority,
             );
+
+            return $args_from_wp[0];
 
         }
 
