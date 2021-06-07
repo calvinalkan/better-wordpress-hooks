@@ -564,7 +564,7 @@
         }
 
         /** @test */
-        public function events_can_be_mapped_to_always_last()
+        public function events_can_be_mapped_to_always_fire_last()
         {
 
 
@@ -615,6 +615,36 @@
             $this->assertSame('run', $GLOBALS['test'][ActionEvent::class]);
             $this->assertSame('run', $GLOBALS['test'][EventFakeStub::class]);
 
+
+        }
+
+        /** @test */
+        public function events_with_a_mapped_priority_can_be_resolved_from_the_container () {
+
+            $GLOBALS['test'][EventWithDependencyAndWpParams::class] = 'not-run';
+
+            $this->newPlugin1();
+
+            Plugin1::ensureLast([
+
+                'init' => EventWithDependencyAndWpParams::class,
+
+            ]);
+
+            Plugin1::boot();
+
+
+            Plugin1::listen(EventWithDependencyAndWpParams::class, function ($event) {
+
+                $this->assertInstanceOf(EventWithDependencyAndWpParams::class, $event);
+                $GLOBALS['test'][EventWithDependencyAndWpParams::class] = 'run';
+
+            });
+
+
+            do_action('init', 'foo', 'bar');
+
+            $this->assertSame('run', $GLOBALS['test'][EventWithDependencyAndWpParams::class]);
 
         }
 

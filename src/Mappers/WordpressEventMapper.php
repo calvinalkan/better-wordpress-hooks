@@ -57,6 +57,7 @@
          */
 		public function map( string $hook_name, $event, int $priority = 10 ) {
 
+
             $event = $this->normalize($event);
 
             if ( isset( $this->mapped_events[ $hook_name ] )) {
@@ -67,36 +68,33 @@
 
             $priority = $event[1] ?? $priority;
 
-			$this->wp_api->addFilter(
-			    $hook_name,
-                $this->buildResolvableForMappedEvent($event[0]),
-                $priority
-            );
-			
+            $this->wp_api->addFilter($hook_name, [$event[0], 'mapEvent'], $priority);
+
 			$this->mapped_events[$hook_name][] = $event[0];
 
 		}
 
-        private function buildResolvableForMappedEvent(string $event) : Closure
-        {
+		public function mapLast ( string $hook_name, string $event ) {
 
-            return function (...$args_from_wp) use ($event) {
+            if ( isset( $this->mapped_events[ $hook_name ] )) {
 
-                $args = collect($args_from_wp)->reject(function ( $arg )  {
+                $this->checkHookCompatibility($hook_name, $event);
 
-                    return empty($arg);
+            }
 
-                });
+            $this->dispatcher->ensureLast($hook_name, [$event, 'mapEvent']);
 
-                $payload = new ReflectionPayload($event, $args->all());
+        }
 
-                $event_object = $this->container->make($event, $payload->build());
+		public function mapFirst ( string $hook_name, string $event ) {
 
-                return $this->dispatcher->dispatch($event_object);
+            if ( isset( $this->mapped_events[ $hook_name ] )) {
 
-            };
+                $this->checkHookCompatibility($hook_name, $event);
 
+            }
 
+		    $this->dispatcher->ensureFirst($hook_name, [$event, 'mapEvent']);
 
         }
 
@@ -112,7 +110,7 @@
         private function checkHookCompatibility(string $hook_name, $event_to_be_mapped)
         {
 
-            if ( ! $this->wp_api->isAction($event_to_be_mapped )) {
+            if ( ! $this->wp_api->isAction( $event_to_be_mapped ) ) {
 
                 throw new ConfigurationException(
                     "You are trying to map more than one event to the hook [$hook_name] but the event: [$event_to_be_mapped] is not an action."

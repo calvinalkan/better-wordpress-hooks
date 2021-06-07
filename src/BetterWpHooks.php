@@ -87,14 +87,10 @@
 
         public function boot()
         {
-
-
             $this->mapEvents();
             $this->mapEnsureFirst();
             $this->mapEnsureLast();
             $this->registerListeners();
-
-
         }
 
         public function container() : ContainerAdapter
@@ -150,6 +146,8 @@
 
                     }
 
+                    $mapped_events = is_array($mapped_events) ? $mapped_events : [$mapped_events];
+
                     foreach ($mapped_events as $mapped_event) {
 
                         $this->event_mapper->map($hook_name, $mapped_event);
@@ -202,9 +200,11 @@
 
             foreach ($this->ensure_first as $hook => $event_objects ) {
 
+                $event_objects = is_array($event_objects) ? $event_objects : [$event_objects];
+
                 foreach ($event_objects as $event_object) {
 
-                    $this->dispatcher->ensureFirst($hook, [$event_object, 'mapEvent'], true);
+                    $this->event_mapper->mapFirst($hook, $event_object);
 
                 }
 
@@ -219,9 +219,12 @@
 
             foreach ($this->ensure_last as $hook => $event_objects ) {
 
+                $event_objects = is_array($event_objects) ? $event_objects : [$event_objects];
+
                 foreach ($event_objects as $event_object) {
 
-                    $this->dispatcher->ensureLast($hook, [$event_object, 'mapEvent'], true);
+                    $this->event_mapper->mapLast($hook, $event_object);
+
 
                 }
 

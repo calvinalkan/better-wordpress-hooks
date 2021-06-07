@@ -17,6 +17,7 @@
     use BetterWpHooks\WordpressApi;
     use Contracts\ContainerAdapter;
     use Illuminate\Support\Arr;
+    use ReflectionPayload\ReflectionPayload;
     use SniccoAdapter\BaseContainerAdapter;
 
     use function BetterWpHooks\Functions\hasTrait;
@@ -177,7 +178,20 @@
         public static function mapEvent(...$args_from_wp)
         {
 
-            return self::dispatch(new static(...$args_from_wp));
+            $args = collect($args_from_wp)->reject(function ( $arg )  {
+
+                return empty($arg);
+
+            });
+
+
+            $reflection_payload = new ReflectionPayload(static::class, $args->all());
+            $payload = $reflection_payload->build();
+
+            $event_object = self::$instance->container()->make(static::class, $payload);
+
+            return self::dispatcher()->dispatch($event_object);
+
 
         }
 

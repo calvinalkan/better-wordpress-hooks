@@ -200,7 +200,7 @@
 
             $listener = $this->createListener($event, array_key_first($callable), $callable);
 
-            $contained_hook = new ContainedListener($event, $listener, $this->hook_api);
+            $contained_hook = new ContainedListener($event, $listener, $callable, $this->hook_api);
 
             $order = ($order === 'last') ? 'last' : 'first';
 

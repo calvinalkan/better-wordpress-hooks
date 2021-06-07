@@ -6,6 +6,7 @@
 
     namespace BetterWpHooks\Listeners;
 
+    use BetterWpHooks\Traits\BetterWpHooksFacade;
     use BetterWpHooks\WordpressApi;
     use Closure;
     use Illuminate\Support\Arr;
@@ -36,24 +37,29 @@
         /** @var WordpressApi */
         private $hook_api;
 
-        public function __construct(string $event, Closure $listener, $hook_api)
+        private $raw_listener;
+
+        public function __construct(string $event, Closure $listener_executable, $raw_listener, $hook_api)
         {
 
-            $this->listener = $listener;
+            $this->listener = $listener_executable;
             $this->event = $event;
             $this->min_priority = PHP_INT_MIN;
             $this->identifier = spl_object_hash($this).'__invoke';
             $this->hook_api = $hook_api;
+            $this->raw_listener = $raw_listener;
         }
 
-        public function proxiesTo () {
-
-            return $this->listener;
-
-        }
 
         public function __invoke(...$args_from_wp)
         {
+
+            if ( $this->isMappedToEventObject() ) {
+
+                $event = $this->raw_listener[0];
+                return call_user_func_array([$event, 'mapEvent'], $args_from_wp);
+
+            }
 
             return call_user_func_array($this->listener, $args_from_wp);
 
@@ -99,17 +105,23 @@
             $hook = $this->getCurrentHookObject();
             $callbacks = $hook->callbacks;
 
+
             $current_highest_priority = array_key_last($callbacks);
 
-            $cb_to_remove = Arr::get($callbacks, $current_highest_priority, []);
+            if ( $current_highest_priority !== PHP_INT_MIN ) {
 
-            $this->removeAll($cb_to_remove, $current_highest_priority);
-            $this->reAdd($cb_to_remove, $current_highest_priority - 1 );
+                $cb_to_remove = Arr::get($callbacks, $current_highest_priority, []);
+                $this->removeAll($cb_to_remove, $current_highest_priority);
+                $this->reAdd($cb_to_remove, $current_highest_priority - 1 );
+
+            }
+
+            $priority = $current_highest_priority === PHP_INT_MIN ? 10 : $current_highest_priority;
 
             $this->hook_api->addFilter(
                 $this->event,
                 [$this, '__invoke'],
-                $current_highest_priority,
+                $priority,
             );
 
         }
@@ -146,6 +158,19 @@
                     $callback['accepted_args']
                 );
             }
+
+        }
+
+        private function isMappedToEventObject() :bool {
+
+            if ( is_callable( [$this->raw_listener[0], 'mapEvent'] ) ) {
+
+                return true;
+
+            }
+
+            return false;
+
 
         }
 
