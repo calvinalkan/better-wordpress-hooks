@@ -304,6 +304,13 @@
 
             }
 
+            if ( $this->listeners[$event] === [] ) {
+
+                unset($this->listeners[$event]);
+
+            }
+
+
         }
 
         /**
@@ -525,8 +532,6 @@
 
         }
 
-
-
         private function isCorrectReturnValue($payload, $filtered, ?object $original_event_object) : bool
         {
 
@@ -554,7 +559,9 @@
 
             $expected = $method->getReturnType()->getName();
 
-            return $expected === gettype($filtered);
+            $actual = (gettype($filtered) === 'boolean') ? 'bool' : gettype($filtered);
+
+            return $expected === $actual;
 
         }
 
