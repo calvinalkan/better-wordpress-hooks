@@ -165,7 +165,7 @@
         /** Remove one listener for a given event from the dispatcher.
          *
          * @param  string  $event
-         * @param  string|object  $listener
+         * @param  string|object|array  $listener
          *
          * @return void
          */
