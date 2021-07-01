@@ -12,7 +12,12 @@
     use PHPUnit\Framework\ExpectationFailedException;
     use PHPUnit\Framework\TestCase;
     use \Mockery as m;
+    use SniccoAdapter\BaseContainerAdapter;
+    use Tests\TestDependencies\Dependency;
+    use Tests\TestEvents\ActionEvent;
+    use Tests\TestEvents\ActionEvent2;
     use Tests\TestEvents\EventFakeStub;
+    use Tests\TestStubs\Plugin1;
 
     class FakeDispatcherTest extends TestCase
     {
@@ -220,6 +225,82 @@
             $dispatcher->shouldHaveReceived( 'dispatch' )->once();
 
 
+        }
+
+        public function testWithCustomErrorMessage()
+        {
+
+            try {
+
+                $this->fake->assertDispatched( EventFakeStub::class, null ,'custom error message' );
+                $this->fail();
+
+            }
+            catch ( ExpectationFailedException $e ) {
+
+                $this->assertThat(
+                    $e, new ExceptionMessage(
+                        'custom error message'
+                    )
+                );
+
+            }
+
+            $this->fake->dispatch( EventFakeStub::class );
+
+            $this->fake->assertDispatched( EventFakeStub::class );
+
+        }
+
+        public function testGetAllDispatchedEvents() {
+
+            $this->fake->dispatch( $e1 = new EventFakeStub() );
+            $this->fake->dispatch( $e2 = new EventFakeStub() );
+            $this->fake->dispatch( $e3 = new ActionEvent() );
+            $this->fake->dispatch( $e4 = new ActionEvent() );
+
+            $all = $this->fake->allDispatchedEvents();
+
+            $this->assertCount(2, $all);
+            $this->assertCount(2, $all[EventFakeStub::class]);
+            $this->assertCount(2, $all[ActionEvent::class]);
+
+            $this->assertSame($e1, $all[EventFakeStub::class][0][0]);
+            $this->assertSame($e2, $all[EventFakeStub::class][1][0]);
+            $this->assertSame($e3, $all[ActionEvent::class][0][0]);
+            $this->assertSame($e4, $all[ActionEvent::class][1][0]);
+
+        }
+
+        public function testGetAllOfType()
+        {
+            $this->fake->dispatch( $e1 = new EventFakeStub() );
+            $this->fake->dispatch( $e2 = new EventFakeStub() );
+            $this->fake->dispatch( $e3 = new ActionEvent() );
+            $this->fake->dispatch( $e4 = new ActionEvent() );
+
+            $all = $this->fake->allOfType(EventFakeStub::class);
+            $this->assertCount(2, $all);
+            $this->assertSame($e1, $all[0]);
+            $this->assertSame($e2, $all[1]);
+        }
+
+        /** @test */
+        public function testWithFacadeEvent () {
+
+            Plugin1::make(new BaseContainerAdapter());
+            Plugin1::fake();
+            Plugin1::dispatch(ActionEvent2::class , $d= new Dependency());
+
+            $all = Plugin1::dispatcher()->allDispatchedEvents();
+            $this->assertCount(1, $all);
+
+            $type = Plugin1::dispatcher()->allOfType(ActionEvent2::class);
+            $this->assertCount(1, $type);
+            $this->assertSame([
+                ActionEvent2::class,
+                [$d]
+            ], $type[0]);
         }
 
         /** @test */
