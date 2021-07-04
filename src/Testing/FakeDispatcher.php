@@ -269,5 +269,10 @@
             });
         }
 
+        public function clearDispatchedEvents()
+        {
+            $this->events = [];
+        }
+
 
     }

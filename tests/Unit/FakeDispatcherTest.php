@@ -285,6 +285,21 @@
             $this->assertSame($e2, $all[1]);
         }
 
+        public function testClearAll() {
+
+            $this->fake->dispatch( $e1 = new EventFakeStub() );
+            $this->fake->dispatch( $e2 = new EventFakeStub() );
+
+            $all = $this->fake->allDispatchedEvents();
+            $this->assertCount(2, $all[EventFakeStub::class]);
+
+            $this->fake->clearDispatchedEvents();
+
+            $all = $this->fake->allDispatchedEvents();
+            $this->assertCount(0, $all);
+
+        }
+
         /** @test */
         public function testWithFacadeEvent () {
 
