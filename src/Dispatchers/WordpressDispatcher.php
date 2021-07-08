@@ -315,6 +315,29 @@
 
         /**
          *
+         * Remove all listeners for the event
+         *
+         * @param  string  $event
+         *
+         * @return void
+         * @throws Exception
+         * @api
+         *
+         */
+        public function forget(string $event)
+        {
+            $listeners = $this->getListeners($event);
+
+            foreach ($listeners as $listener) {
+
+                $this->forgetOne($event, $listener);
+
+            }
+
+        }
+
+        /**
+         *
          * Can be chained to the listen function to mark an event as unremovable
          *
          * @api
@@ -698,6 +721,7 @@
             return $key;
 
         }
+
 
 
     }

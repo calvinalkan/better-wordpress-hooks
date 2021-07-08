@@ -173,6 +173,18 @@
         {
         }
 
+        /** Remove all listeners for the event
+         *
+         * @param  string  $event
+         *
+         * @return void
+         */
+        public static function forget(string $event) : void
+        {
+        }
+
+
+
         /**
          * Assert if an event was dispatched based on a truth-test callback.
          *

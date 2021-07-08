@@ -551,6 +551,25 @@
         }
 
 
+        /** @test */
+        public function all_listeners_for_an_event_can_be_forgotten () {
+
+            // Not working if not the exact method
+            $this->dispatcher->listen('event1', ActionListener::class);
+            $this->dispatcher->listen('event1', StdClassListener::class);
+
+            $this->assertHasListener(ActionListener::class.'@handleEvent', 'event1');
+            $this->assertHasListener(StdClassListener::class.'@handleEvent', 'event1');
+
+            $this->dispatcher->forget('event1');
+
+            $this->assertNoListener(ActionListener::class.'@handleEvent', 'event1');
+            $this->assertNoListener(StdClassListener::class.'@handleEvent', 'event1');
+
+
+        }
+
+
         /**
          *
          *
