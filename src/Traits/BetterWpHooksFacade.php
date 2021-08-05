@@ -6,6 +6,7 @@
 
     namespace BetterWpHooks\Traits;
 
+    use BadMethodCallException;
     use BetterWpHooks\BetterWpHooks;
     use BetterWpHooks\Contracts\Dispatcher;
     use BetterWpHooks\Dispatchers\WordpressDispatcher;
@@ -17,6 +18,7 @@
     use BetterWpHooks\WordpressApi;
     use Contracts\ContainerAdapter;
     use Illuminate\Support\Arr;
+    use ReflectionClass;
     use ReflectionPayload\ReflectionPayload;
     use SniccoAdapter\BaseContainerAdapter;
 
@@ -99,7 +101,7 @@
 
                 }
 
-                throw new \BadMethodCallException(
+                throw new BadMethodCallException(
                     'Method '.get_class($instance).'::'.$method.'() does not exist.'
                 );
 
@@ -136,7 +138,6 @@
 
             }
 
-
             return $dispatcher->dispatch(
 
                 array_shift($arguments),
@@ -151,7 +152,7 @@
         {
 
 
-            $class = new \ReflectionClass(static::class);
+            $class = new ReflectionClass(static::class);
             $constructor_args = ($constructor = $class->getConstructor()) ? $constructor->getNumberOfParameters() : null;
 
             if ( ! $constructor_args) {
@@ -178,14 +179,11 @@
         public static function mapEvent(...$args_from_wp)
         {
 
-            $args = collect($args_from_wp)->reject(function ( $arg )  {
+            if ($args_from_wp[0] === '') {
+                array_values(Arr::wrap(array_shift($args_from_wp)));
+            }
 
-                return empty($arg);
-
-            });
-
-
-            $reflection_payload = new ReflectionPayload(static::class, $args->all());
+            $reflection_payload = new ReflectionPayload(static::class, $args_from_wp);
             $payload = $reflection_payload->build();
 
             $event_object = self::$instance->container()->make(static::class, $payload);
@@ -215,7 +213,7 @@
 
                 if ( ! self::isEventObject($event_object)) {
 
-                    throw new \BadMethodCallException(
+                    throw new BadMethodCallException(
                         'Doing it wrong: The Plugin facade is not meant to be used for conditional dispatching. You should use event objects instead'
                     );
 
