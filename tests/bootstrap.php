@@ -17,7 +17,6 @@
 
     if ( $root_dir ) {
 
-
         define('ROOT_DIR', rtrim($root_dir , $ds));
         define('TESTS_DIR', ROOT_DIR . $ds . 'tests');
         define('VENDOR_DIR', ROOT_DIR . $ds . 'vendor');

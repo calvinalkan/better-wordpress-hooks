@@ -603,7 +603,7 @@
 
             }
 
-            return is_object($payload) ? $payload : $payload[0];
+            return is_object($payload) ? $payload : $payload[0] ?? $payload;
 
         }
 
