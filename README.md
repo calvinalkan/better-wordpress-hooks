@@ -1,3 +1,7 @@
+ ## ⚠️⚠️⚠️ This repository has been deprecated in favor of [`snicco/better-wp-hooks`](https://github.com/snicco/snicco). A stable v1.0.0 has been released and is actively developed.
+
+---
+
 # BetterWpHooks - A modern, OOP Wrapper around the WordPress Plugin API.
 
 ![CircleCI](https://img.shields.io/circleci/build/github/calvinalkan/better-wordpress-hooks/master?label=circleci&token=888f31e8ca77ad9621a420ab09ce799f3382d52e)
